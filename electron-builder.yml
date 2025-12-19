@@ -1,0 +1,51 @@
+appId: com.dbatools.incidentmanager
+productName: DBA Incident Manager
+copyright: Copyright © 2024
+directories:
+  output: dist
+  buildResources: public
+
+files:
+  - dist-electron/**/*
+  - dist/**/*
+  - server/dist/**/*
+  - node_modules/**/*
+  - package.json
+
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+  icon: public/icon.ico
+  artifactName: ${productName}-Setup-${version}.${ext}
+
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+
+mac:
+  target:
+    - target: dmg
+      arch:
+        - x64
+        - arm64
+  icon: public/icon.icns
+  category: public.app-category.developer-tools
+  hardenedRuntime: true
+  gatekeeperAssess: false
+
+dmg:
+  title: ${productName} ${version}
+  icon: public/icon.icns
+
+linux:
+  target:
+    - target: AppImage
+      arch:
+        - x64
+  icon: public/icon.png
+  category: Development
+  maintainer: your-email@example.com
