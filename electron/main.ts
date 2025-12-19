@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain } from 'electron';
+import { app, BrowserWindow, ipcMain, Notification } from 'electron';
 import path from 'path';
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -7,6 +7,38 @@ if (require('electron-squirrel-startup')) {
 }
 
 let mainWindow: BrowserWindow | null = null;
+
+// Handle notifications
+ipcMain.handle('show-notification', async (_event, { title, body, urgency }) => {
+  if (!Notification.isSupported()) {
+    console.error('Notifications are not supported on this system');
+    return { success: false, error: 'Notifications not supported' };
+  }
+
+  try {
+    const notification = new Notification({
+      title,
+      body,
+      urgency: urgency || 'normal', // low, normal, critical
+      icon: path.join(__dirname, '../public/icon.png'),
+      sound: 'default'
+    });
+
+    notification.on('click', () => {
+      // Focus the main window when notification is clicked
+      if (mainWindow) {
+        if (mainWindow.isMinimized()) mainWindow.restore();
+        mainWindow.focus();
+      }
+    });
+
+    notification.show();
+    return { success: true };
+  } catch (error) {
+    console.error('Error showing notification:', error);
+    return { success: false, error: String(error) };
+  }
+});
 
 const createWindow = () => {
   // Create the browser window.

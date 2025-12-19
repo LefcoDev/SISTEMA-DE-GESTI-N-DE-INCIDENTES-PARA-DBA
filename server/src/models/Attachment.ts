@@ -3,7 +3,8 @@ import sequelize from '../config/database';
 
 interface AttachmentAttributes {
   id: number;
-  incident_id: number;
+  incident_id?: number;
+  note_id?: number;
   filename: string;
   original_filename: string;
   filepath: string;
@@ -13,11 +14,12 @@ interface AttachmentAttributes {
   uploaded_at?: Date;
 }
 
-interface AttachmentCreationAttributes extends Optional<AttachmentAttributes, 'id' | 'uploaded_at'> {}
+interface AttachmentCreationAttributes extends Optional<AttachmentAttributes, 'id' | 'incident_id' | 'note_id' | 'uploaded_at'> {}
 
 class Attachment extends Model<AttachmentAttributes, AttachmentCreationAttributes> implements AttachmentAttributes {
   public id!: number;
-  public incident_id!: number;
+  public incident_id?: number;
+  public note_id?: number;
   public filename!: string;
   public original_filename!: string;
   public filepath!: string;
@@ -35,7 +37,11 @@ Attachment.init({
   },
   incident_id: {
     type: DataTypes.INTEGER,
-    allowNull: false,
+    allowNull: true,
+  },
+  note_id: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
   },
   filename: {
     type: DataTypes.STRING(255),

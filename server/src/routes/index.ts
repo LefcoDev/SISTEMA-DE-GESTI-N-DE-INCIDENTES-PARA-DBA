@@ -12,6 +12,13 @@ import userRoutes from './user.routes';
 import reportRoutes from './report.routes';
 import auditRoutes from './audit.routes';
 import monitoringRoutes from './monitoring.routes';
+import notesRoutes from './notes.routes';
+import remindersRoutes from './reminders.routes';
+import knowledgeRoutes from './knowledge.routes';
+import journalRoutes from './journal.routes';
+import topicsRoutes from './topics.routes';
+import resourcesRoutes from './resources.routes';
+import notificationsRoutes from './notifications.routes';
 
 const router = Router();
 
@@ -28,5 +35,12 @@ router.use('/users', userRoutes);
 router.use('/reports', reportRoutes);
 router.use('/audit', auditRoutes);
 router.use('/monitoring', monitoringRoutes);
+router.use('/notes', notesRoutes);
+router.use('/reminders', remindersRoutes);
+router.use('/knowledge', knowledgeRoutes);
+router.use('/journal', journalRoutes);
+router.use('/topics', topicsRoutes);
+router.use('/resources', resourcesRoutes);
+router.use('/notifications', notificationsRoutes);
 
 export default router;

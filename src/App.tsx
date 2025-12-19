@@ -18,6 +18,10 @@ import Search from './pages/search/Search';
 import Settings from './pages/settings/Settings';
 import AuditLogList from './pages/audit/AuditLogList';
 import MonitoringDashboard from './pages/monitoring/MonitoringDashboard';
+import NotesDashboard from './pages/notes/NotesDashboard';
+import { RemindersDashboard } from './pages/reminders/RemindersDashboard';
+import { KnowledgeDashboard } from './pages/knowledge/KnowledgeDashboard';
+import { JournalDashboard } from './pages/journal/JournalDashboard';
 
 function App() {
   return (
@@ -39,6 +43,10 @@ function App() {
               <Route index element={<Navigate to="/dashboard" replace />} />
               <Route path="dashboard" element={<Dashboard />} />
               <Route path="monitoring" element={<MonitoringDashboard />} />
+              <Route path="notes" element={<NotesDashboard />} />
+              <Route path="reminders" element={<RemindersDashboard />} />
+              <Route path="knowledge" element={<KnowledgeDashboard />} />
+              <Route path="journal" element={<JournalDashboard />} />
               <Route path="incidents" element={<IncidentList />} />
               <Route path="incidents/:id" element={<IncidentDetail />} />
               <Route path="servers" element={<ServerList />} />

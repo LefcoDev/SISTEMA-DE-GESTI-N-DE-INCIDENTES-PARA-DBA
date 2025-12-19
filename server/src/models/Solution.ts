@@ -44,12 +44,12 @@ export class Solution extends Model<SolutionAttributes, SolutionCreationAttribut
 Solution.init(
   {
     id: {
-      type: DataTypes.INTEGER.UNSIGNED,
+      type: DataTypes.INTEGER,
       autoIncrement: true,
       primaryKey: true,
     },
     incident_id: {
-      type: DataTypes.INTEGER.UNSIGNED,
+      type: DataTypes.INTEGER,
       allowNull: true,
       references: {
         model: Incident,
@@ -93,7 +93,7 @@ Solution.init(
       allowNull: true,
     },
     applied_by: {
-      type: DataTypes.INTEGER.UNSIGNED,
+      type: DataTypes.INTEGER,
       allowNull: false,
       references: {
         model: User,
@@ -111,10 +111,5 @@ Solution.init(
     underscored: true,
   }
 );
-
-// Define associations
-Solution.belongsTo(Incident, { foreignKey: 'incident_id', as: 'incident' });
-Solution.belongsTo(User, { foreignKey: 'applied_by', as: 'applicator' });
-Incident.hasMany(Solution, { foreignKey: 'incident_id', as: 'solutions' });
 
 export default Solution;

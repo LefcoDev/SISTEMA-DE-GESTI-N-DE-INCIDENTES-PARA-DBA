@@ -14,6 +14,10 @@ import {
   Cog6ToothIcon,
   ShieldCheckIcon,
   SignalIcon,
+  PencilSquareIcon,
+  BellIcon,
+  AcademicCapIcon,
+  CalendarIcon,
 } from '@heroicons/react/24/outline';
 import clsx from 'clsx';
 import { useAuth } from '../../context/AuthContext';
@@ -21,6 +25,10 @@ import { useAuth } from '../../context/AuthContext';
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
   { name: 'Monitoreo', href: '/monitoring', icon: SignalIcon },
+  { name: 'Notas', href: '/notes', icon: PencilSquareIcon },
+  { name: 'Recordatorios', href: '/reminders', icon: BellIcon },
+  { name: 'Aprendizaje', href: '/knowledge', icon: AcademicCapIcon },
+  { name: 'Bitácora', href: '/journal', icon: CalendarIcon },
   { name: 'Incidentes', href: '/incidents', icon: ExclamationTriangleIcon },
   { name: 'Servidores', href: '/servers', icon: ServerIcon },
   { name: 'Soluciones', href: '/solutions', icon: BookOpenIcon },
