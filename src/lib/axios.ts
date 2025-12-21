@@ -32,8 +32,15 @@ api.interceptors.response.use(
       !error.config.url.includes('/auth/me')
     ) {
       localStorage.removeItem('token');
-      if (window.location.pathname !== '/login') {
-        window.location.href = '/login';
+      if (window.location.hash !== '#/login') {
+        // If the app uses HashRouter (recommended for Electron), update the hash
+        // to navigate without causing the renderer to try loading file:/// paths.
+        try {
+          window.location.hash = '#/login';
+        } catch (e) {
+          // Fallback to href if hash is not available for some reason
+          window.location.href = '/login';
+        }
       }
     }
     return Promise.reject(error);
