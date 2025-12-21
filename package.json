@@ -1,6 +1,6 @@
 {
   "name": "dba-incident-manager",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Aplicación de escritorio para administradores de bases de datos",
   "main": "dist-electron/main.js",
   "scripts": {
