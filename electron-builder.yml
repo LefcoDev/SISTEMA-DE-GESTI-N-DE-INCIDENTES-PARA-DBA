@@ -2,7 +2,12 @@ appId: com.dbatools.incidentmanager
 productName: DBA Incident Manager
 copyright: Copyright © 2024
 directories:
-  output: dist
+  output: release
+
+publish:
+  provider: github
+  owner: LefcoDev
+  repo: SISTEMA-DE-GESTI-N-DE-INCIDENTES-PARA-DBA
   buildResources: public
 
 files:

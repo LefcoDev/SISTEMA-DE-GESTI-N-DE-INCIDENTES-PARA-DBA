@@ -29,11 +29,18 @@
   "author": "DBA Tools Team",
   "license": "MIT",
   "build": {
-    "appId": "com.dbatools.incident-manager",
+    "appId": "com.dbatools.incidentmanager",
     "productName": "DBA Incident Manager",
     "directories": {
       "output": "release"
     },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "LefcoDev",
+        "repo": "SISTEMA-DE-GESTI-N-DE-INCIDENTES-PARA-DBA"
+      }
+    ],
     "files": [
       "dist/**/*",
       "dist-electron/**/*",
