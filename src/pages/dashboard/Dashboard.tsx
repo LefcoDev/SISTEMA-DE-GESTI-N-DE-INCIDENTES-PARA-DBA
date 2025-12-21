@@ -33,7 +33,7 @@ export default function Dashboard() {
     <div className="p-6 space-y-6">
       <div className="flex items-center gap-3">
         <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-        <span className="px-2 py-1 text-xs font-medium bg-indigo-100 text-indigo-800 rounded-full">v1.0.1</span>
+        <span className="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">v1.0.4</span>
       </div>
       
       {/* KPI Cards */}
