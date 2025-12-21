@@ -27,6 +27,20 @@ export const markAsRead = async (req: Request, res: Response) => {
   }
 };
 
+export const markAllAsRead = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+    await notificationService.markAllAsRead(userId);
+    res.json({ message: 'All notifications marked as read' });
+  } catch (error) {
+    console.error('Error marking all notifications as read:', error);
+    res.status(500).json({ error: 'Failed to mark all notifications as read' });
+  }
+};
+
 export const dismissNotification = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;

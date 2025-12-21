@@ -1,6 +1,8 @@
 import Reminder from '../models/Reminder';
 import NotificationQueue from '../models/NotificationQueue';
 import User from '../models/User';
+import Incident from '../models/Incident';
+import Server from '../models/Server';
 import { Op } from 'sequelize';
 import logger from '../utils/logger';
 import emailService from './email.service';
@@ -249,7 +251,31 @@ export class NotificationService {
         limit: 50
       });
 
-      return notifications;
+      // Filter out orphaned notifications (cleanup on read)
+      const validNotifications = [];
+      for (const notification of notifications) {
+        let isValid = true;
+        
+        if (notification.entity_type === 'incident' && notification.entity_id) {
+           const exists = await Incident.count({ where: { id: notification.entity_id } });
+           if (!exists) {
+             isValid = false;
+             await notification.destroy(); // Auto-cleanup
+           }
+        } else if (notification.entity_type === 'server' && notification.entity_id) {
+           const exists = await Server.count({ where: { id: notification.entity_id } });
+           if (!exists) {
+             isValid = false;
+             await notification.destroy(); // Auto-cleanup
+           }
+        }
+
+        if (isValid) {
+          validNotifications.push(notification);
+        }
+      }
+
+      return validNotifications;
     } catch (error) {
       logger.error(`Error getting notifications for user ${userId}:`, error);
       return [];
@@ -284,6 +310,27 @@ export class NotificationService {
     }
   }
 
+  // Mark all notifications as read for a user
+  async markAllAsRead(userId: number) {
+    try {
+      await NotificationQueue.update(
+        { 
+          status: 'read',
+          read_at: new Date()
+        },
+        {
+          where: {
+            user_id: userId,
+            status: { [Op.in]: ['pending', 'sent'] }
+          }
+        }
+      );
+    } catch (error) {
+      logger.error(`Error marking all notifications as read for user ${userId}:`, error);
+      throw error;
+    }
+  }
+
   // Dismiss notification
   async dismissNotification(notificationId: number) {
     try {
@@ -294,6 +341,21 @@ export class NotificationService {
       }
     } catch (error) {
       logger.error(`Error dismissing notification ${notificationId}:`, error);
+    }
+  }
+
+  // Delete notifications for a specific entity (Cleanup)
+  async deleteNotificationsForEntity(entityType: string, entityId: number) {
+    try {
+      await NotificationQueue.destroy({
+        where: {
+          entity_type: entityType,
+          entity_id: entityId
+        }
+      });
+      logger.info(`Deleted notifications for ${entityType} #${entityId}`);
+    } catch (error) {
+      logger.error(`Error deleting notifications for ${entityType} #${entityId}:`, error);
     }
   }
 }

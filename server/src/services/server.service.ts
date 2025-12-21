@@ -1,4 +1,5 @@
 import Server from '../models/Server';
+import notificationService from './notification.service';
 
 export class ServerService {
   async findAll() {
@@ -27,6 +28,10 @@ export class ServerService {
   async delete(id: number) {
     const server = await Server.findByPk(id);
     if (!server) return null;
+
+    // Delete associated notifications
+    await notificationService.deleteNotificationsForEntity('server', id);
+
     return await server.destroy();
   }
 }

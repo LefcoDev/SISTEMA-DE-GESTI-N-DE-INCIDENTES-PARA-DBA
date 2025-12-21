@@ -137,6 +137,10 @@ export class IncidentService {
   async delete(id: number) {
     const incident = await Incident.findByPk(id);
     if (!incident) return null;
+
+    // Delete associated notifications to prevent orphaned notifications
+    await notificationService.deleteNotificationsForEntity('incident', id);
+
     return await incident.destroy();
   }
 
