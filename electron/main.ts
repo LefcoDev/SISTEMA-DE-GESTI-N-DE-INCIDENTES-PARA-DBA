@@ -10,6 +10,14 @@ autoUpdater.logger = log;
 autoUpdater.autoDownload = false;
 autoUpdater.autoInstallOnAppQuit = true;
 
+// Force update check on startup
+app.on('ready', () => {
+  // Check for updates every 10 minutes
+  setInterval(() => {
+    autoUpdater.checkForUpdates();
+  }, 10 * 60 * 1000);
+});
+
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
   app.quit();
@@ -207,36 +215,47 @@ function checkForUpdates() {
 
 // Auto-updater events
 autoUpdater.on('checking-for-update', () => {
-  console.log('Checking for updates...');
+  log.info('Checking for updates...');
+  if (mainWindow) {
+    mainWindow.webContents.send('update-status', 'checking');
+  }
 });
 
 autoUpdater.on('update-available', (info) => {
-  console.log('Update available:', info);
+  log.info('Update available:', info);
   if (mainWindow) {
     mainWindow.webContents.send('update-available', info);
+    mainWindow.webContents.send('update-status', 'available');
   }
 });
 
 autoUpdater.on('update-not-available', (info) => {
-  console.log('Update not available:', info);
+  log.info('Update not available:', info);
+  if (mainWindow) {
+    mainWindow.webContents.send('update-status', 'not-available');
+  }
 });
 
 autoUpdater.on('error', (err) => {
-  console.error('Error in auto-updater:', err);
+  log.error('Error in auto-updater:', err);
+  if (mainWindow) {
+    mainWindow.webContents.send('update-error', err.message);
+  }
 });
 
 autoUpdater.on('download-progress', (progressObj) => {
   const message = `Download speed: ${progressObj.bytesPerSecond} - Downloaded ${progressObj.percent}%`;
-  console.log(message);
+  log.info(message);
   if (mainWindow) {
     mainWindow.webContents.send('download-progress', progressObj);
   }
 });
 
 autoUpdater.on('update-downloaded', (info) => {
-  console.log('Update downloaded:', info);
+  log.info('Update downloaded:', info);
   if (mainWindow) {
     mainWindow.webContents.send('update-downloaded', info);
+    mainWindow.webContents.send('update-status', 'downloaded');
   }
 });
 
