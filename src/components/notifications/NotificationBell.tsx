@@ -18,6 +18,12 @@ export const NotificationBell: React.FC = () => {
 
   const handleNotificationClick = async (notification: any) => {
     await markAsRead(notification.id);
+    
+    if (notification.onAction) {
+      notification.onAction();
+      return;
+    }
+
     if (notification.action_url) {
       navigate(notification.action_url);
     }

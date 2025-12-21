@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { ArrowDownTrayIcon } from '@heroicons/react/24/outline';
 import { useModal } from '../context/ModalContext';
+import { useNotifications } from '../hooks/useNotifications';
 
 interface UpdateInfo {
   version: string;
@@ -16,6 +17,7 @@ interface DownloadProgress {
 
 export default function UpdateNotification() {
   const { showModal } = useModal();
+  const { addSystemNotification } = useNotifications();
   const [downloading, setDownloading] = useState(false);
   const [downloadProgress, setDownloadProgress] = useState<DownloadProgress | null>(null);
 
@@ -23,6 +25,20 @@ export default function UpdateNotification() {
     // Listen for update events from Electron
     if (window.electron) {
       window.electron.on('update-available', (info: UpdateInfo) => {
+        // Add notification to the bell
+        addSystemNotification({
+          title: 'Actualización Disponible',
+          message: `Nueva versión ${info.version} disponible.`,
+          type: 'system_update',
+          priority: 'high',
+          action_url: '#', // Or trigger download
+          onAction: () => {
+             setDownloading(true);
+             window.electron.invoke('download-update');
+          }
+        });
+
+        // Show modal
         showModal({
           title: 'Actualización Disponible',
           message: `Nueva versión ${info.version} disponible. ¿Desea descargarla ahora?`,

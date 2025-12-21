@@ -3,6 +3,7 @@ import { AuthProvider } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { ModalProvider } from './context/ModalContext';
 import { MenuProvider } from './context/MenuContext';
+import { NotificationProvider } from './context/NotificationContext';
 import GlobalModal from './components/ui/GlobalModal';
 import UpdateNotification from './components/UpdateNotification';
 import ProtectedRoute from './components/auth/ProtectedRoute';
@@ -31,9 +32,10 @@ function App() {
       <AuthProvider>
         <ModalProvider>
           <MenuProvider>
-            <GlobalModal />
-            <UpdateNotification />
-            <Routes>
+            <NotificationProvider>
+              <GlobalModal />
+              <UpdateNotification />
+              <Routes>
             <Route path="/login" element={<Login />} />
             
             <Route
@@ -64,7 +66,10 @@ function App() {
               <Route path="reports" element={<Reports />} />
               <Route path="settings" element={<Settings />} /> 
             </Route>
-          </Routes>          </MenuProvider>        </ModalProvider>
+          </Routes>
+            </NotificationProvider>
+          </MenuProvider>
+        </ModalProvider>
       </AuthProvider>
     </ThemeProvider>
   );
