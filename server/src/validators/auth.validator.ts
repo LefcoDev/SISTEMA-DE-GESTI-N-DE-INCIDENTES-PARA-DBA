@@ -48,6 +48,11 @@ export const updateProfileValidator = [
     .isEmail().withMessage('Please provide a valid email')
     .normalizeEmail(),
 
+  body('phone_number')
+    .optional()
+    .trim()
+    .isLength({ max: 20 }).withMessage('Phone number must be less than 20 characters'),
+
   body('role')
     .optional()
     .isIn(['admin', 'senior_dba', 'junior_dba']).withMessage('Invalid role'),

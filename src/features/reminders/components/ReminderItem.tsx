@@ -1,7 +1,7 @@
 import React from 'react';
 import { Reminder, ReminderPriority } from '../types/reminder.types';
 import { BellIcon, CheckCircleIcon, ClockIcon, TrashIcon, PencilSquareIcon } from '@heroicons/react/24/outline';
-import { format, isPast } from 'date-fns';
+import { formatDate, isPast } from '../../../lib/dateUtils';
 import clsx from 'clsx';
 
 interface ReminderItemProps {
@@ -53,7 +53,7 @@ export const ReminderItem: React.FC<ReminderItemProps> = ({ reminder, onEdit, on
           <div className="flex items-center mt-2 text-xs text-gray-500 space-x-4 flex-wrap gap-y-1">
             <div className="flex items-center">
               <ClockIcon className="h-4 w-4 mr-1" />
-              {reminder.scheduled_at ? format(new Date(reminder.scheduled_at), 'PPp') : 'No date'}
+              {reminder.scheduled_at ? formatDate(new Date(reminder.scheduled_at), 'time') : 'No date'}
             </div>
             {reminder.type === 'recurring' && (
               <span className="bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded border border-indigo-100">

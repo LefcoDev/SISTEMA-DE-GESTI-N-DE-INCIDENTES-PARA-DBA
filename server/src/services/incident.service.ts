@@ -7,6 +7,8 @@ import Solution from '../models/Solution';
 import IncidentHistory from '../models/IncidentHistory';
 import Attachment from '../models/Attachment';
 import Tag from '../models/Tag';
+import notificationService from './notification.service';
+import logger from '../utils/logger';
 
 export class IncidentService {
   async findAll(filters: any = {}) {
@@ -44,30 +46,92 @@ export class IncidentService {
         { model: Server, as: 'server' },
         { model: User, as: 'assignee', attributes: ['id', 'full_name', 'email'] },
         { model: User, as: 'creator', attributes: ['id', 'full_name', 'email'] },
-        { model: Solution, include: [{ model: User, attributes: ['full_name'] }] },
-        { model: IncidentHistory, include: [{ model: User, attributes: ['full_name'] }] },
-        { model: Attachment, include: [{ model: User, attributes: ['full_name'] }] },
+        { 
+          model: Solution, 
+          as: 'solutions', 
+          include: [{ model: User, as: 'applicator', foreignKey: 'applied_by', attributes: ['full_name'] }] 
+        },
+        { 
+          model: IncidentHistory, 
+          include: [{ model: User, foreignKey: 'changed_by', attributes: ['full_name'] }] 
+        },
+        { 
+          model: Attachment, 
+          include: [{ model: User, foreignKey: 'uploaded_by', attributes: ['full_name'] }] 
+        },
         { model: Tag, through: { attributes: [] } }
-      ],
-      order: [
-        [IncidentHistory, 'changed_at', 'DESC'],
-        [Solution, 'created_at', 'DESC']
       ]
     });
   }
 
   async create(data: any, userId: number) {
-    return await Incident.create({
+    const incident = await Incident.create({
       ...data,
       created_by: userId,
       status: 'new', // Default status
     });
+
+    // Notify all users about new incident
+    const allUsers = await User.findAll();
+    const notifyUserIds = allUsers.map(u => u.id);
+
+    // Send notifications
+    if (notifyUserIds.length > 0) {
+      try {
+        const assignedUser = data.assigned_to ? await User.findByPk(data.assigned_to) : null;
+        await notificationService.createIncidentNotification(
+          notifyUserIds,
+          'incident_created',
+          {
+            id: incident.id,
+            title: data.title,
+            severity: data.severity,
+            description: data.description,
+            assigned_to: assignedUser?.full_name,
+          }
+        );
+        logger.info(`Sent incident creation notifications to ${notifyUserIds.length} users`);
+      } catch (error) {
+        logger.error('Failed to send incident creation notifications:', error);
+      }
+    }
+
+    return incident;
   }
 
   async update(id: number, data: any) {
     const incident = await Incident.findByPk(id);
     if (!incident) return null;
-    return await incident.update(data);
+
+    const oldAssignedTo = incident.assigned_to;
+    const newAssignedTo = data.assigned_to;
+
+    const updatedIncident = await incident.update(data);
+
+    // If assigned_to changed, notify the new assignee
+    if (newAssignedTo && newAssignedTo !== oldAssignedTo) {
+      try {
+        const assignedUser = await User.findByPk(newAssignedTo);
+        if (assignedUser) {
+          await notificationService.createIncidentNotification(
+            [newAssignedTo],
+            'incident_assigned',
+            {
+              id: incident.id,
+              title: incident.title,
+              severity: incident.severity,
+              description: incident.description,
+              assigned_to: assignedUser.full_name,
+            }
+          );
+          logger.info(`Sent incident assignment notification to user ${newAssignedTo}`);
+        }
+      } catch (error) {
+        logger.error('Failed to send incident assignment notification:', error);
+      }
+    }
+
+    return updatedIncident;
   }
 
   async delete(id: number) {
@@ -112,7 +176,7 @@ export class IncidentService {
       where,
       limit: 5,
       include: [
-        { model: Solution, required: false } // Include solutions if any
+        { model: Solution, as: 'solutions', required: false } // Include solutions if any
       ],
       order: [['created_at', 'DESC']]
     });

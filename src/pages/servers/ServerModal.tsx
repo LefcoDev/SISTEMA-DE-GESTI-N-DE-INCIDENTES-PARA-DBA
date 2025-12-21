@@ -1,6 +1,7 @@
 import { Fragment, useEffect, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
+import PasswordInput from '../../components/PasswordInput';
 
 interface Server {
   id?: number;
@@ -277,15 +278,17 @@ export default function ServerModal({ isOpen, onClose, onSave, server, type }: S
                               </div>
                               <div>
                                 <label htmlFor="monitoring_password" className="block text-sm font-medium text-gray-700">Contraseña</label>
-                                <input
-                                  type="password"
-                                  name="monitoring_password"
-                                  id="monitoring_password"
-                                  value={formData.monitoring_password || ''}
-                                  onChange={(e) => setFormData({ ...formData, monitoring_password: e.target.value })}
-                                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border p-2"
-                                  placeholder="••••••••"
-                                />
+                                <div className="mt-1">
+                                  <PasswordInput
+                                    id="monitoring_password"
+                                    name="monitoring_password"
+                                    value={formData.monitoring_password || ''}
+                                    onChange={(e) => setFormData({ ...formData, monitoring_password: e.target.value })}
+                                    placeholder="••••••••"
+                                    autoComplete="new-password"
+                                    className="border p-2"
+                                  />
+                                </div>
                               </div>
                             </div>
                             

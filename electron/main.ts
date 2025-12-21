@@ -1,5 +1,14 @@
 import { app, BrowserWindow, ipcMain, Notification } from 'electron';
+import { autoUpdater } from 'electron-updater';
 import path from 'path';
+import fs from 'fs';
+import log from 'electron-log';
+
+// Configure logging
+log.transports.file.level = 'info';
+autoUpdater.logger = log;
+autoUpdater.autoDownload = false;
+autoUpdater.autoInstallOnAppQuit = true;
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
@@ -20,7 +29,7 @@ ipcMain.handle('show-notification', async (_event, { title, body, urgency }) => 
       title,
       body,
       urgency: urgency || 'normal', // low, normal, critical
-      icon: path.join(__dirname, '../public/icon.png'),
+      icon: path.join(__dirname, '../icon/base-de-datos.ico'),
       sound: 'default'
     });
 
@@ -52,8 +61,12 @@ const createWindow = () => {
       nodeIntegration: false,
       contextIsolation: true,
     },
-    icon: path.join(__dirname, '../public/icon.png')
+    icon: path.join(__dirname, '../icon/base-de-datos.ico'),
+    autoHideMenuBar: true
   });
+
+  // Remove menu bar completely
+  mainWindow.setMenuBarVisibility(false);
 
   // and load the index.html of the app.
   // In development, we wait for the vite server to be ready
@@ -63,13 +76,98 @@ const createWindow = () => {
     mainWindow.webContents.openDevTools();
   } else {
     mainWindow.loadFile(path.join(__dirname, '../dist/index.html'));
+    mainWindow.webContents.openDevTools(); // Habilitar DevTools en producción para debugging
   }
+};
+
+// Start backend server
+const startServer = () => {
+  if (app.isPackaged) {
+    console.log('=== STARTING SERVER IN PACKAGED MODE ===');
+    try {
+      // Set environment variables for the server
+      process.env.NODE_ENV = 'production';
+      process.env.PORT = '3001';
+      
+      // Setup user data paths
+      const userDataPath = app.getPath('userData');
+      const logDir = path.join(userDataPath, 'logs');
+      const uploadDir = path.join(userDataPath, 'uploads');
+      const backupDir = path.join(userDataPath, 'backups');
+      
+      console.log('User data path:', userDataPath);
+      
+      if (!fs.existsSync(logDir)) fs.mkdirSync(logDir, { recursive: true });
+      if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
+      if (!fs.existsSync(backupDir)) fs.mkdirSync(backupDir, { recursive: true });
+      
+      process.env.LOG_DIR = logDir;
+      process.env.UPLOAD_DIR = uploadDir;
+      process.env.BACKUP_DIR = backupDir;
+      
+      // Load .env file from resources (editable by user)
+      const envPath = path.join(process.resourcesPath, '.env');
+      log.info('Loading .env from:', envPath);
+      if (fs.existsSync(envPath)) {
+        require('dotenv').config({ path: envPath });
+        log.info('.env loaded successfully');
+      } else {
+        log.warn('.env file not found at:', envPath);
+      }
+      
+      // Import and run the server from ASAR (require works fine with ASAR)
+      const serverPath = path.join(__dirname, '../server/dist/index.js');
+      log.info('Loading server from:', serverPath);
+      
+      require(serverPath);
+      
+      console.log('=== SERVER LOADED SUCCESSFULLY ===');
+      log.info('Server started successfully on port 3001');
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorStack = error instanceof Error ? error.stack : '';
+      console.error('=== ERROR STARTING SERVER ===');
+      console.error('Error:', errorMessage);
+      console.error('Stack:', errorStack);
+      log.error('Error starting server:', error);
+      
+      // Show error in dialog after window is created
+      setTimeout(() => {
+        if (mainWindow) {
+          const safeMessage = JSON.stringify(errorMessage);
+          mainWindow.webContents.executeJavaScript(`
+            console.error('SERVER ERROR:', ${safeMessage});
+            alert('Error al iniciar el servidor:\\n\\n' + ${safeMessage} + '\\n\\nRevisa la consola para más detalles.');
+          `);
+        }
+      }, 6000);
+    }
+  } else {
+    console.log('=== DEVELOPMENT MODE - Server should be started manually ===');
+  }
+};
+
+// Stop backend server
+const stopServer = () => {
+  // Server runs in the same process, will close with app
+  console.log('App closing, server will terminate with process');
 };
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 app.whenReady().then(() => {
-  createWindow();
+  // Start server first
+  startServer();
+  
+  // Wait longer for server to fully start
+  setTimeout(() => {
+    createWindow();
+  }, 5000);
+
+  // Check for updates (only in production)
+  if (app.isPackaged) {
+    checkForUpdates();
+  }
 
   app.on('activate', () => {
     // On OS X it's common to re-create a window in the app when the
@@ -84,9 +182,85 @@ app.whenReady().then(() => {
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
+  stopServer();
   if (process.platform !== 'darwin') {
     app.quit();
   }
 });
 
+app.on('before-quit', () => {
+  stopServer();
+});
+
 // IPC Handlers will be added here
+
+// Auto-updater functions
+function checkForUpdates() {
+  try {
+    autoUpdater.checkForUpdates().catch(err => {
+      console.error('Failed to check for updates:', err);
+    });
+  } catch (err) {
+    console.error('Failed to initiate update check:', err);
+  }
+}
+
+// Auto-updater events
+autoUpdater.on('checking-for-update', () => {
+  console.log('Checking for updates...');
+});
+
+autoUpdater.on('update-available', (info) => {
+  console.log('Update available:', info);
+  if (mainWindow) {
+    mainWindow.webContents.send('update-available', info);
+  }
+});
+
+autoUpdater.on('update-not-available', (info) => {
+  console.log('Update not available:', info);
+});
+
+autoUpdater.on('error', (err) => {
+  console.error('Error in auto-updater:', err);
+});
+
+autoUpdater.on('download-progress', (progressObj) => {
+  const message = `Download speed: ${progressObj.bytesPerSecond} - Downloaded ${progressObj.percent}%`;
+  console.log(message);
+  if (mainWindow) {
+    mainWindow.webContents.send('download-progress', progressObj);
+  }
+});
+
+autoUpdater.on('update-downloaded', (info) => {
+  console.log('Update downloaded:', info);
+  if (mainWindow) {
+    mainWindow.webContents.send('update-downloaded', info);
+  }
+});
+
+// IPC handlers for update
+ipcMain.handle('download-update', async () => {
+  try {
+    await autoUpdater.downloadUpdate();
+    return { success: true };
+  } catch (error) {
+    console.error('Error downloading update:', error);
+    return { success: false, error: String(error) };
+  }
+});
+
+ipcMain.handle('install-update', () => {
+  autoUpdater.quitAndInstall(false, true);
+});
+
+ipcMain.handle('check-for-updates', async () => {
+  try {
+    const result = await autoUpdater.checkForUpdates();
+    return { success: true, data: result };
+  } catch (error) {
+    console.error('Error checking for updates:', error);
+    return { success: false, error: String(error) };
+  }
+});

@@ -3,7 +3,10 @@ import dotenv from 'dotenv';
 import path from 'path';
 import logger from '../utils/logger';
 
-dotenv.config({ path: path.join(__dirname, '../../../.env') });
+// Only load .env if not in production (Electron handles env vars in production)
+if (process.env.NODE_ENV !== 'production') {
+  dotenv.config({ path: path.join(__dirname, '../../../.env') });
+}
 
 const sequelize = new Sequelize(
   process.env.DB_NAME || 'dba_incident_manager',
@@ -14,6 +17,11 @@ const sequelize = new Sequelize(
     dialect: 'mysql',
     port: parseInt(process.env.DB_PORT || '3306'),
     logging: (msg) => logger.debug(msg),
+    dialectOptions: {
+      ssl: process.env.DB_HOST?.includes('aivencloud.com') ? {
+        rejectUnauthorized: true,
+      } : undefined
+    },
     pool: {
       max: 5,
       min: 0,

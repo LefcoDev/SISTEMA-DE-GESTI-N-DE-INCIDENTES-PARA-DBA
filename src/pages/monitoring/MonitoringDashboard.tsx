@@ -1,9 +1,6 @@
 import { useState, useEffect } from 'react';
 import { 
   ServerIcon, 
-  CheckCircleIcon, 
-  XCircleIcon, 
-  ClockIcon,
   ArrowPathIcon 
 } from '@heroicons/react/24/outline';
 import api from '../../lib/axios';

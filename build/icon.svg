@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="none">
+  <!-- Background circle -->
+  <circle cx="128" cy="128" r="120" fill="#2563EB"/>
+  
+  <!-- Database icon in white -->
+  <g transform="translate(128, 128)">
+    <!-- Top ellipse -->
+    <ellipse cx="0" cy="-45" rx="60" ry="20" fill="#FFFFFF"/>
+    
+    <!-- Middle layer -->
+    <path d="M -60 -25 Q -60 -10, 0 -10 Q 60 -10, 60 -25" fill="#FFFFFF"/>
+    <path d="M -60 -25 L -60 15 Q -60 30, 0 30 Q 60 30, 60 15 L 60 -25" fill="#E5E7EB"/>
+    <ellipse cx="0" cy="-25" rx="60" ry="15" fill="#FFFFFF"/>
+    
+    <!-- Bottom layer -->
+    <path d="M -60 15 L -60 55 Q -60 70, 0 70 Q 60 70, 60 55 L 60 15" fill="#9CA3AF"/>
+    <ellipse cx="0" cy="15" rx="60" ry="15" fill="#FFFFFF"/>
+    
+    <!-- Top layer outline -->
+    <ellipse cx="0" cy="-45" rx="60" ry="20" fill="none" stroke="#1E40AF" stroke-width="3"/>
+    <path d="M -60 -45 L -60 -25" stroke="#1E40AF" stroke-width="3"/>
+    <path d="M 60 -45 L 60 -25" stroke="#1E40AF" stroke-width="3"/>
+    
+    <!-- Alert indicator (red dot) -->
+    <circle cx="45" cy="-60" r="12" fill="#EF4444"/>
+    <path d="M 45 -65 L 45 -58 M 45 -53 L 45 -52" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"/>
+  </g>
+</svg>

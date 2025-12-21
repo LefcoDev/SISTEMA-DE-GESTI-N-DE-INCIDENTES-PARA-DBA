@@ -17,12 +17,13 @@ interface ServerAttributes {
   service_name?: string;
   manual_tns?: string;
   last_check?: Date;
+  last_status?: 'online' | 'offline';
   created_by?: number;
   created_at?: Date;
   updated_at?: Date;
 }
 
-interface ServerCreationAttributes extends Optional<ServerAttributes, 'id' | 'engine_version' | 'description' | 'status' | 'monitoring_enabled' | 'monitoring_user' | 'monitoring_password' | 'service_name' | 'manual_tns' | 'last_check' | 'created_by' | 'created_at' | 'updated_at'> {}
+interface ServerCreationAttributes extends Optional<ServerAttributes, 'id' | 'engine_version' | 'description' | 'status' | 'monitoring_enabled' | 'monitoring_user' | 'monitoring_password' | 'service_name' | 'manual_tns' | 'last_check' | 'last_status' | 'created_by' | 'created_at' | 'updated_at'> {}
 
 class Server extends Model<ServerAttributes, ServerCreationAttributes> implements ServerAttributes {
   public id!: number;
@@ -40,6 +41,7 @@ class Server extends Model<ServerAttributes, ServerCreationAttributes> implement
   public service_name?: string;
   public manual_tns?: string;
   public last_check?: Date;
+  public last_status?: 'online' | 'offline';
   public created_by?: number;
   public readonly created_at!: Date;
   public readonly updated_at!: Date;
@@ -103,6 +105,10 @@ Server.init({
   },
   last_check: {
     type: DataTypes.DATE,
+  },
+  last_status: {
+    type: DataTypes.ENUM('online', 'offline'),
+    allowNull: true,
   },
   created_by: {
     type: DataTypes.INTEGER,

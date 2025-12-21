@@ -4,7 +4,7 @@ import api from '../lib/axios';
 export interface Notification {
   id: number;
   user_id: number;
-  type: 'reminder' | 'mention' | 'comment' | 'share' | 'suggestion';
+  type: 'reminder' | 'mention' | 'comment' | 'share' | 'suggestion' | 'server_down' | 'database_error' | 'incident_created' | 'incident_assigned' | 'monitoring_alert';
   title: string;
   message?: string;
   entity_type?: string;

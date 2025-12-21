@@ -19,18 +19,53 @@ export interface Incident {
   created_by: number;
   created_at: string;
   updated_at: string;
+  incident_date?: string;
   server?: {
+    id: number;
     name: string;
     ip_address: string;
   };
   creator?: {
+    id: number;
     full_name: string;
     email: string;
   };
   assignee?: {
+    id: number;
     full_name: string;
     email: string;
   };
+  tags?: Array<{
+    id: number;
+    name: string;
+    color: string;
+  }>;
+  attachments?: Array<{
+    id: number;
+    filename: string;
+    file_path: string;
+    file_size: number;
+  }>;
+  solutions?: Array<{
+    id: number;
+    description: string;
+    created_at: string;
+    creator?: {
+      full_name: string;
+    };
+  }>;
+  status_history?: Array<{
+    status: string;
+    timestamp: string;
+    user?: {
+      full_name: string;
+    };
+  }>;
+  similar_incidents?: Array<{
+    id: number;
+    title: string;
+    similarity: number;
+  }>;
 }
 
 export const incidentService = {

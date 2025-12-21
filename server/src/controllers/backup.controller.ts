@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import { User, Server, Incident, Solution, Script, Tag, IncidentTag, ScriptTag, Attachment, ExecutionHistory, AuditLog, IncidentHistory, AppSettings } from '../models';
 
-const BACKUP_DIR = path.join(__dirname, '../../../backups');
+const BACKUP_DIR = process.env.BACKUP_DIR || path.join(__dirname, '../../../backups');
 
 // Ensure backup directory exists
 if (!fs.existsSync(BACKUP_DIR)) {

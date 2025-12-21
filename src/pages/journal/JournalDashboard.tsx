@@ -4,8 +4,10 @@ import { JournalEntry, CreateJournalEntryDTO } from '../../features/journal/type
 import { journalService } from '../../features/journal/services/journal.service';
 import { JournalEntryCard } from '../../features/journal/components/JournalEntryCard';
 import { JournalEntryForm } from '../../features/journal/components/JournalEntryForm';
+import { useModal } from '../../context/ModalContext';
 
 export const JournalDashboard: React.FC = () => {
+  const { showModal } = useModal();
   const [entries, setEntries] = useState<JournalEntry[]>([]);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingEntry, setEditingEntry] = useState<JournalEntry | null>(null);
@@ -44,14 +46,22 @@ export const JournalDashboard: React.FC = () => {
     }
   };
 
-  const handleDelete = async (id: number) => {
-    if (!window.confirm('Are you sure you want to delete this entry?')) return;
-    try {
-      await journalService.delete(id);
-      setEntries(entries.filter(e => e.id !== id));
-    } catch (error) {
-      console.error('Failed to delete journal entry:', error);
-    }
+  const handleDelete = (id: number) => {
+    showModal({
+      title: 'Eliminar Entrada',
+      message: '¿Estás seguro de que deseas eliminar esta entrada?',
+      type: 'confirm',
+      confirmText: 'Eliminar',
+      cancelText: 'Cancelar',
+      onConfirm: async () => {
+        try {
+          await journalService.delete(id);
+          setEntries(entries.filter(e => e.id !== id));
+        } catch (error) {
+          console.error('Failed to delete journal entry:', error);
+        }
+      }
+    });
   };
 
   const filteredEntries = entries

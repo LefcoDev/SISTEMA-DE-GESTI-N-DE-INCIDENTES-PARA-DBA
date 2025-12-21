@@ -57,10 +57,10 @@ export const updateIncidentValidator = [
   body('status')
     .optional()
     .isIn(['new', 'in_progress', 'waiting', 'resolved', 'closed']),
-  body('assigned_to').optional().isInt(),
-  body('impact').optional().isIn(['critical', 'high', 'medium', 'low']),
-  body('resolution_time_minutes').optional().isInt(),
-  body('started_work_at').optional().isISO8601(),
-  body('resolved_at').optional().isISO8601(),
-  body('closed_at').optional().isISO8601(),
+  body('assigned_to').optional({ nullable: true }).isInt(),
+  body('impact').optional({ nullable: true }).isIn(['critical', 'high', 'medium', 'low']),
+  body('resolution_time_minutes').optional({ nullable: true }).isInt(),
+  body('started_work_at').optional({ nullable: true }).isISO8601(),
+  body('resolved_at').optional({ nullable: true }).isISO8601(),
+  body('closed_at').optional({ nullable: true }).isISO8601(),
 ];

@@ -98,7 +98,7 @@ export default function ScriptModal({ isOpen, onClose, onSave, script }: ScriptM
               leaveFrom="opacity-100 translate-y-0 sm:scale-100"
               leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
             >
-              <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-2xl sm:p-6">
+              <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-5xl sm:p-6">
                 <div className="absolute top-0 right-0 hidden pt-4 pr-4 sm:block">
                   <button
                     type="button"
@@ -111,87 +111,137 @@ export default function ScriptModal({ isOpen, onClose, onSave, script }: ScriptM
                 </div>
                 
                 <div className="mt-3 text-center sm:mt-0 sm:text-left w-full">
-                  <Dialog.Title as="h3" className="text-lg font-medium leading-6 text-gray-900">
+                  <Dialog.Title as="h3" className="text-lg font-medium leading-6 text-gray-900 mb-6">
                     {script ? 'Editar Script' : 'Nuevo Script'}
                   </Dialog.Title>
                   
-                  <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-                    <div className="grid grid-cols-1 gap-y-4 gap-x-4 sm:grid-cols-2">
-                      <div className="sm:col-span-2">
-                        <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                          Nombre
-                        </label>
-                        <input
-                          type="text"
-                          name="name"
-                          id="name"
-                          required
-                          value={formData.name}
-                          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border p-2"
-                        />
+                  <form onSubmit={handleSubmit} className="space-y-4">
+                    {/* Layout: Metadata (left) + Code Editor (right) */}
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                      {/* Left column: Metadata */}
+                      <div className="lg:col-span-1 space-y-4">
+                        <div>
+                          <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+                            Nombre *
+                          </label>
+                          <input
+                            type="text"
+                            name="name"
+                            id="name"
+                            required
+                            value={formData.name}
+                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border p-2"
+                          />
+                        </div>
+
+                        <div>
+                          <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+                            Descripción *
+                          </label>
+                          <textarea
+                            name="description"
+                            id="description"
+                            rows={3}
+                            required
+                            value={formData.description}
+                            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border p-2"
+                          />
+                        </div>
+
+                        <div>
+                          <label htmlFor="language" className="block text-sm font-medium text-gray-700">
+                            Lenguaje
+                          </label>
+                          <select
+                            id="language"
+                            name="language"
+                            value={formData.language}
+                            onChange={(e) => setFormData({ ...formData, language: e.target.value })}
+                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border p-2"
+                          >
+                            <option value="sql">SQL</option>
+                            <option value="bash">Bash</option>
+                            <option value="powershell">PowerShell</option>
+                            <option value="python">Python</option>
+                          </select>
+                        </div>
+
+                        <div>
+                          <label htmlFor="category" className="block text-sm font-medium text-gray-700">
+                            Categoría
+                          </label>
+                          <select
+                            id="category"
+                            name="category"
+                            value={formData.category}
+                            onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border p-2"
+                          >
+                            <option value="maintenance">Mantenimiento</option>
+                            <option value="monitoring">Monitoreo</option>
+                            <option value="backup">Backup</option>
+                            <option value="performance">Rendimiento</option>
+                            <option value="administration">Administración</option>
+                          </select>
+                        </div>
+
+                        <div>
+                          <label htmlFor="engine_compatible" className="block text-sm font-medium text-gray-700">
+                            Motor Compatible
+                          </label>
+                          <input
+                            type="text"
+                            name="engine_compatible"
+                            id="engine_compatible"
+                            value={formData.engine_compatible}
+                            onChange={(e) => setFormData({ ...formData, engine_compatible: e.target.value })}
+                            placeholder="ej. Oracle 19c, PostgreSQL 14"
+                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border p-2"
+                          />
+                        </div>
+
+                        <div>
+                          <label htmlFor="tags" className="block text-sm font-medium text-gray-700">
+                            Tags (separados por coma)
+                          </label>
+                          <input
+                            type="text"
+                            name="tags"
+                            id="tags"
+                            value={formData.tags}
+                            onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
+                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border p-2"
+                            placeholder="ej. backup, diario, critico"
+                          />
+                        </div>
+
+                        <div>
+                          <label htmlFor="parameters_description" className="block text-sm font-medium text-gray-700">
+                            Parámetros
+                          </label>
+                          <textarea
+                            name="parameters_description"
+                            id="parameters_description"
+                            rows={2}
+                            value={formData.parameters_description}
+                            onChange={(e) => setFormData({ ...formData, parameters_description: e.target.value })}
+                            placeholder="Descripción de parámetros requeridos"
+                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border p-2"
+                          />
+                        </div>
                       </div>
 
-                      <div className="sm:col-span-2">
-                        <label htmlFor="description" className="block text-sm font-medium text-gray-700">
-                          Descripción
-                        </label>
-                        <textarea
-                          name="description"
-                          id="description"
-                          rows={2}
-                          required
-                          value={formData.description}
-                          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border p-2"
-                        />
-                      </div>
-
-                      <div>
-                        <label htmlFor="language" className="block text-sm font-medium text-gray-700">
-                          Lenguaje
-                        </label>
-                        <select
-                          id="language"
-                          name="language"
-                          value={formData.language}
-                          onChange={(e) => setFormData({ ...formData, language: e.target.value })}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border p-2"
-                        >
-                          <option value="sql">SQL</option>
-                          <option value="bash">Bash</option>
-                          <option value="powershell">PowerShell</option>
-                          <option value="python">Python</option>
-                        </select>
-                      </div>
-
-                      <div>
-                        <label htmlFor="category" className="block text-sm font-medium text-gray-700">
-                          Categoría
-                        </label>
-                        <select
-                          id="category"
-                          name="category"
-                          value={formData.category}
-                          onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border p-2"
-                        >
-                          <option value="maintenance">Mantenimiento</option>
-                          <option value="monitoring">Monitoreo</option>
-                          <option value="backup">Backup</option>
-                          <option value="performance">Rendimiento</option>
-                          <option value="administration">Administración</option>
-                        </select>
-                      </div>
-
-                      <div className="sm:col-span-2">
+                      {/* Right column: Code Editor */}
+                      <div className="lg:col-span-2">
                         <label htmlFor="code" className="block text-sm font-medium text-gray-700 mb-2">
-                          Código
+                          Código *
                         </label>
-                        <div className="border rounded-md overflow-hidden" style={{ height: '300px' }}>
+                        <div className="border rounded-md overflow-hidden" style={{ height: '500px' }}>
                           <MonacoEditor
                             width="100%"
-                            height="300"
+                            height="500"
                             language={
                               formData.language === 'bash' ? 'shell' : 
                               formData.language === 'powershell' ? 'powershell' : 
@@ -201,59 +251,17 @@ export default function ScriptModal({ isOpen, onClose, onSave, script }: ScriptM
                             value={formData.code}
                             options={{
                               selectOnLineNumbers: true,
-                              minimap: { enabled: false },
+                              minimap: { enabled: true },
                               scrollBeyondLastLine: false,
                               automaticLayout: true,
-                              fontSize: 13
+                              fontSize: 14,
+                              lineNumbers: 'on',
+                              renderWhitespace: 'selection',
+                              wordWrap: 'on'
                             }}
                             onChange={(newValue) => setFormData({ ...formData, code: newValue })}
                           />
                         </div>
-                      </div>
-
-                      <div>
-                        <label htmlFor="engine_compatible" className="block text-sm font-medium text-gray-700">
-                          Motor Compatible (Opcional)
-                        </label>
-                        <input
-                          type="text"
-                          name="engine_compatible"
-                          id="engine_compatible"
-                          value={formData.engine_compatible}
-                          onChange={(e) => setFormData({ ...formData, engine_compatible: e.target.value })}
-                          placeholder="ej. Oracle 19c, PostgreSQL 14"
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border p-2"
-                        />
-                      </div>
-
-                      <div>
-                        <label htmlFor="tags" className="block text-sm font-medium text-gray-700">
-                          Tags (separados por coma)
-                        </label>
-                        <input
-                          type="text"
-                          name="tags"
-                          id="tags"
-                          value={formData.tags}
-                          onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border p-2"
-                          placeholder="ej. backup, diario, critico"
-                        />
-                      </div>
-
-                      <div>
-                        <label htmlFor="parameters_description" className="block text-sm font-medium text-gray-700">
-                          Parámetros (Opcional)
-                        </label>
-                        <input
-                          type="text"
-                          name="parameters_description"
-                          id="parameters_description"
-                          value={formData.parameters_description}
-                          onChange={(e) => setFormData({ ...formData, parameters_description: e.target.value })}
-                          placeholder="Descripción de parámetros requeridos"
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border p-2"
-                        />
                       </div>
                     </div>
 

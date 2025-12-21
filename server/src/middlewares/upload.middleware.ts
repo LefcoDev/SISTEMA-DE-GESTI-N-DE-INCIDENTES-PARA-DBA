@@ -5,7 +5,10 @@ import fs from 'fs';
 // Configure storage for avatars
 const avatarStorage = multer.diskStorage({
   destination: (req, file, cb) => {
-    const uploadPath = path.join(__dirname, '../../uploads/avatars');
+    const uploadPath = process.env.UPLOAD_DIR 
+      ? path.join(process.env.UPLOAD_DIR, 'avatars')
+      : path.join(__dirname, '../../uploads/avatars');
+      
     if (!fs.existsSync(uploadPath)) {
       fs.mkdirSync(uploadPath, { recursive: true });
     }
@@ -20,7 +23,10 @@ const avatarStorage = multer.diskStorage({
 // Configure storage for attachments
 const attachmentStorage = multer.diskStorage({
   destination: (req, file, cb) => {
-    const uploadPath = path.join(__dirname, '../../uploads/attachments');
+    const uploadPath = process.env.UPLOAD_DIR 
+      ? path.join(process.env.UPLOAD_DIR, 'attachments')
+      : path.join(__dirname, '../../uploads/attachments');
+
     if (!fs.existsSync(uploadPath)) {
       fs.mkdirSync(uploadPath, { recursive: true });
     }

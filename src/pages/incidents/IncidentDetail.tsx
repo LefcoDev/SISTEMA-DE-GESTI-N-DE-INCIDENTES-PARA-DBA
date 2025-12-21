@@ -1,7 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { format } from 'date-fns';
-import { es } from 'date-fns/locale';
+import { formatDate } from '../../lib/dateUtils';
 import api from '../../lib/axios';
 import { 
   ClockIcon, 
@@ -12,6 +11,7 @@ import {
   ArrowDownTrayIcon,
   PlusIcon
 } from '@heroicons/react/24/outline';
+import { useModal } from '../../context/ModalContext';
 
 interface IncidentDetail {
   id: number;
@@ -65,6 +65,7 @@ interface IncidentDetail {
 export default function IncidentDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { showModal } = useModal();
   const [incident, setIncident] = useState<IncidentDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
@@ -102,15 +103,19 @@ export default function IncidentDetail() {
       await fetchIncident();
     } catch (error) {
       console.error('Error uploading file:', error);
-      alert('Error al subir el archivo');
+      showModal({
+        title: 'Error',
+        message: 'Error al subir el archivo',
+        type: 'error'
+      });
     } finally {
       setUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
     }
   };
 
-  const handleDownload = (filename: string, originalName: string) => {
-    const baseUrl = (import.meta.env.VITE_API_URL || 'http://localhost:3001/api').replace('/api', '');
+  const handleDownload = (filename: string) => {
+    const baseUrl = (import.meta.env?.VITE_API_URL || 'http://localhost:3001/api').replace('/api', '');
     const url = `${baseUrl}/uploads/attachments/${filename}`;
     window.open(url, '_blank');
   };
@@ -180,7 +185,7 @@ export default function IncidentDetail() {
             <div className="sm:col-span-1">
               <dt className="text-sm font-medium text-gray-500">Detectado</dt>
               <dd className="mt-1 text-sm text-gray-900">
-                {format(new Date(incident.detected_at), 'PPpp', { locale: es })}
+                {formatDate(new Date(incident.detected_at), 'datetime')}
               </dd>
             </div>
             
@@ -197,7 +202,7 @@ export default function IncidentDetail() {
                       <span
                         key={tag.id}
                         className="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset"
-                        style={{ backgroundColor: `${tag.color}20`, color: tag.color, ringColor: `${tag.color}40` }}
+                        style={{ backgroundColor: `${tag.color}20`, color: tag.color }}
                       >
                         {tag.name}
                       </span>
@@ -242,13 +247,13 @@ export default function IncidentDetail() {
                           <div className="ml-4 flex min-w-0 flex-1 gap-2 flex-col">
                             <span className="truncate font-medium">{attachment.filename}</span>
                             <span className="text-gray-500 text-xs">
-                              {format(new Date(attachment.created_at), 'dd/MM/yyyy HH:mm')}
+                              {formatDate(new Date(attachment.created_at), 'datetime')}
                             </span>
                           </div>
                         </div>
                         <div className="ml-4 flex-shrink-0">
                           <button
-                            onClick={() => handleDownload(attachment.file_path, attachment.filename)}
+                            onClick={() => handleDownload(attachment.file_path)}
                             className="font-medium text-indigo-600 hover:text-indigo-500 flex items-center"
                           >
                             <ArrowDownTrayIcon className="h-4 w-4 mr-1" />
@@ -326,7 +331,7 @@ export default function IncidentDetail() {
                               </div>
                               <div className="whitespace-nowrap text-right text-sm text-gray-500">
                                 <time dateTime={event.changed_at}>
-                                  {format(new Date(event.changed_at), 'MMM d, HH:mm', { locale: es })}
+                                  {formatDate(new Date(event.changed_at), 'time')}
                                 </time>
                               </div>
                             </div>

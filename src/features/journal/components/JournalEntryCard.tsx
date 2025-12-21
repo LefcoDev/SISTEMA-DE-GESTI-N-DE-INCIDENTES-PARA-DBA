@@ -1,7 +1,7 @@
 import React from 'react';
 import { JournalEntry } from '../types/journal.types';
 import { CalendarIcon, ClockIcon, TagIcon, PencilSquareIcon, TrashIcon } from '@heroicons/react/24/outline';
-import { format } from 'date-fns';
+import { formatDate } from '../../../lib/dateUtils';
 
 interface JournalEntryCardProps {
   entry: JournalEntry;
@@ -27,7 +27,7 @@ export const JournalEntryCard: React.FC<JournalEntryCardProps> = ({ entry, onEdi
           </div>
           <div>
             <h3 className="text-lg font-semibold text-gray-900">
-              {entry.entry_date ? format(new Date(entry.entry_date), 'PPPP') : 'No date'}
+              {entry.entry_date ? formatDate(new Date(entry.entry_date), 'full') : 'No date'}
             </h3>
             <div className="flex items-center text-sm text-gray-500 space-x-3">
               <span className="flex items-center">

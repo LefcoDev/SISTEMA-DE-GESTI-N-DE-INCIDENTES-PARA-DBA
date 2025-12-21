@@ -161,7 +161,7 @@ export default function Search() {
                       <Link to={`/solutions/${solution.id}`} className="block hover:bg-gray-50">
                         <div className="px-4 py-4 sm:px-6">
                           <div className="flex items-center justify-between">
-                            <p className="text-sm font-medium text-indigo-600 truncate">{solution.title}</p>
+                            <p className="text-sm font-medium text-indigo-600 truncate">Solution #{solution.id}</p>
                           </div>
                         </div>
                       </Link>

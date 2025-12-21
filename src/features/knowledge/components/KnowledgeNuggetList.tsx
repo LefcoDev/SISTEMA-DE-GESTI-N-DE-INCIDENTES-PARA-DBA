@@ -1,10 +1,12 @@
 import React from 'react';
 import { KnowledgeNugget } from '../types/knowledge.types';
-import { CheckBadgeIcon, CodeBracketIcon, BookOpenIcon } from '@heroicons/react/24/outline';
+import { CheckBadgeIcon, CodeBracketIcon, BookOpenIcon, PencilIcon, TrashIcon, EyeIcon } from '@heroicons/react/24/outline';
 
 interface KnowledgeNuggetListProps {
   nuggets: KnowledgeNugget[];
   onEdit: (nugget: KnowledgeNugget) => void;
+  onDelete: (id: number) => void;
+  onView: (nugget: KnowledgeNugget) => void;
 }
 
 const complexityColors = {
@@ -14,7 +16,7 @@ const complexityColors = {
   expert: 'bg-red-100 text-red-800',
 };
 
-export const KnowledgeNuggetList: React.FC<KnowledgeNuggetListProps> = ({ nuggets, onEdit }) => {
+export const KnowledgeNuggetList: React.FC<KnowledgeNuggetListProps> = ({ nuggets, onEdit, onDelete, onView }) => {
   if (nuggets.length === 0) {
     return (
       <div className="text-center py-12">
@@ -43,10 +45,7 @@ export const KnowledgeNuggetList: React.FC<KnowledgeNuggetListProps> = ({ nugget
             </div>
             
             <h3 className="mt-2 text-lg font-medium text-gray-900">
-              <button onClick={() => onEdit(nugget)} className="focus:outline-none hover:underline text-left">
-                <span aria-hidden="true" className="absolute inset-0" />
-                {nugget.title}
-              </button>
+              {nugget.title}
             </h3>
             
             <p className="mt-1 text-sm text-gray-500 line-clamp-3">
@@ -65,10 +64,33 @@ export const KnowledgeNuggetList: React.FC<KnowledgeNuggetListProps> = ({ nugget
           <div className="border-t border-gray-100 bg-gray-50 px-4 py-2 flex justify-between items-center">
             <div className="text-xs text-gray-500">
               {nugget.technology} • {nugget.category}
+              {nugget.code_example && (
+                <CodeBracketIcon className="inline-block ml-2 h-4 w-4 text-gray-400" title="Has code example" />
+              )}
             </div>
-            {nugget.code_example && (
-              <CodeBracketIcon className="h-4 w-4 text-gray-400" title="Has code example" />
-            )}
+            <div className="flex gap-2 relative z-10">
+              <button
+                onClick={() => onView(nugget)}
+                className="text-blue-600 hover:text-blue-900"
+                title="Ver detalles"
+              >
+                <EyeIcon className="h-4 w-4" />
+              </button>
+              <button
+                onClick={() => onEdit(nugget)}
+                className="text-indigo-600 hover:text-indigo-900"
+                title="Editar"
+              >
+                <PencilIcon className="h-4 w-4" />
+              </button>
+              <button
+                onClick={() => onDelete(nugget.id)}
+                className="text-red-600 hover:text-red-900"
+                title="Eliminar"
+              >
+                <TrashIcon className="h-4 w-4" />
+              </button>
+            </div>
           </div>
         </div>
       ))}

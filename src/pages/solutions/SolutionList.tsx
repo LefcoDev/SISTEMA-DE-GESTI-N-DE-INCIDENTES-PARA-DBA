@@ -1,13 +1,15 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { solutionService, Solution } from '../../services/solution.service';
-import { PlusIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import { MagnifyingGlassIcon, EyeIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { useModal } from '../../context/ModalContext';
 
 export default function SolutionList() {
   const [solutions, setSolutions] = useState<Solution[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<'all' | 'solution' | 'template'>('all');
+  const { showModal } = useModal();
 
   useEffect(() => {
     loadSolutions();
@@ -22,6 +24,24 @@ export default function SolutionList() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleDelete = async (id: number) => {
+    showModal({
+      type: 'confirm',
+      title: 'Eliminar Solución',
+      message: '¿Estás seguro de eliminar esta solución? Esta acción no se puede deshacer.',
+      onConfirm: async () => {
+        try {
+          await solutionService.delete(id);
+          setSolutions(solutions.filter(s => s.id !== id));
+          showModal({ type: 'success', title: 'Éxito', message: 'Solución eliminada correctamente' });
+        } catch (error) {
+          console.error('Error deleting solution:', error);
+          showModal({ type: 'error', title: 'Error', message: 'No se pudo eliminar la solución' });
+        }
+      }
+    });
   };
 
   const filteredSolutions = solutions.filter(solution => {
@@ -158,12 +178,21 @@ export default function SolutionList() {
                       {new Date(solution.applied_at).toLocaleDateString()}
                     </td>
                     <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
-                      <Link to={`/solutions/${solution.id}`} className="text-indigo-600 hover:text-indigo-900 mr-4">
-                        Ver
-                      </Link>
-                      <Link to={`/solutions/${solution.id}/edit`} className="text-indigo-600 hover:text-indigo-900">
-                        Editar
-                      </Link>
+                      <div className="flex justify-end gap-3">
+                        <Link to={`/solutions/${solution.id}`} className="text-indigo-600 hover:text-indigo-900" title="Ver">
+                          <EyeIcon className="h-5 w-5" />
+                        </Link>
+                        <Link to={`/solutions/${solution.id}/edit`} className="text-indigo-600 hover:text-indigo-900" title="Editar">
+                          <PencilIcon className="h-5 w-5" />
+                        </Link>
+                        <button
+                          onClick={() => handleDelete(solution.id)}
+                          className="text-red-600 hover:text-red-900"
+                          title="Eliminar"
+                        >
+                          <TrashIcon className="h-5 w-5" />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}

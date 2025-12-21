@@ -8,6 +8,7 @@ interface UserAttributes {
   full_name: string;
   role: 'admin' | 'senior_dba' | 'junior_dba';
   profile_picture?: string;
+  phone_number?: string;
   is_active: boolean;
   last_login?: Date;
   created_at?: Date;
@@ -23,6 +24,7 @@ class User extends Model<UserAttributes, UserCreationAttributes> implements User
   public full_name!: string;
   public role!: 'admin' | 'senior_dba' | 'junior_dba';
   public profile_picture?: string;
+  public phone_number?: string;
   public is_active!: boolean;
   public last_login?: Date;
   public readonly created_at!: Date;
@@ -54,6 +56,10 @@ User.init({
   },
   profile_picture: {
     type: DataTypes.STRING(500),
+  },
+  phone_number: {
+    type: DataTypes.STRING(20),
+    allowNull: true,
   },
   is_active: {
     type: DataTypes.BOOLEAN,

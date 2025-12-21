@@ -4,7 +4,7 @@ import sequelize from '../config/database';
 interface NotificationQueueAttributes {
   id: number;
   user_id: number;
-  type: 'reminder' | 'mention' | 'comment' | 'share' | 'suggestion';
+  type: 'reminder' | 'mention' | 'comment' | 'share' | 'suggestion' | 'server_down' | 'database_error' | 'incident_created' | 'incident_assigned' | 'monitoring_alert';
   title: string;
   message?: string;
   entity_type?: string;
@@ -23,7 +23,7 @@ interface NotificationQueueCreationAttributes extends Optional<NotificationQueue
 class NotificationQueue extends Model<NotificationQueueAttributes, NotificationQueueCreationAttributes> implements NotificationQueueAttributes {
   public id!: number;
   public user_id!: number;
-  public type!: 'reminder' | 'mention' | 'comment' | 'share' | 'suggestion';
+  public type!: 'reminder' | 'mention' | 'comment' | 'share' | 'suggestion' | 'server_down' | 'database_error' | 'incident_created' | 'incident_assigned' | 'monitoring_alert';
   public title!: string;
   public message?: string;
   public entity_type?: string;
@@ -49,7 +49,7 @@ NotificationQueue.init(
       allowNull: false,
     },
     type: {
-      type: DataTypes.ENUM('reminder', 'mention', 'comment', 'share', 'suggestion'),
+      type: DataTypes.ENUM('reminder', 'mention', 'comment', 'share', 'suggestion', 'server_down', 'database_error', 'incident_created', 'incident_assigned', 'monitoring_alert'),
       allowNull: false,
     },
     title: {

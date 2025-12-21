@@ -1,10 +1,13 @@
-import dotenv from 'dotenv';
-import path from 'path';
+// Load environment variables from root .env file (only in development)
+// In production (Electron), .env is loaded by the main process
+if (process.env.NODE_ENV !== 'production') {
+  const dotenv = require('dotenv');
+  const path = require('path');
+  const envPath = path.join(__dirname, '../../.env');
+  dotenv.config({ path: envPath });
+  console.log('Loading .env from:', envPath);
+}
 
-// Load environment variables from root .env file
-const envPath = path.join(__dirname, '../../.env');
-dotenv.config({ path: envPath });
-console.log('Loading .env from:', envPath);
 console.log('DB Config:', {
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
@@ -21,16 +24,16 @@ const PORT = process.env.PORT || 3001;
 
 const startServer = async () => {
   try {
-    // Sync database
-    await sequelize.sync({ alter: true });
-    logger.info('Database synced successfully');
+    // Sync database - use authenticate only, don't alter schema
+    await sequelize.authenticate();
+    logger.info('Database connection established successfully');
 
     const server = app.listen(PORT, () => {
       logger.info(`Server running on port ${PORT} in ${process.env.NODE_ENV} mode`);
       
       // Start monitoring scheduler
       const monitoringService = new MonitoringService();
-      const MONITORING_INTERVAL = 5 * 60 * 1000; // 5 minutes
+      const MONITORING_INTERVAL = 1 * 60 * 1000; // 1 minute
       
       logger.info('Starting monitoring scheduler...');
       
@@ -65,16 +68,19 @@ const startServer = async () => {
 
     // Handle unhandled promise rejections
     process.on('unhandledRejection', (err: Error) => {
-      logger.error('UNHANDLED REJECTION! 💥 Shutting down...');
+      logger.error('UNHANDLED REJECTION! 💥');
       logger.error(err.name, err.message);
-      server.close(() => {
-        process.exit(1);
-      });
+      // Do not exit the process in Electron environment as it kills the main window
+      if (process.env.NODE_ENV !== 'production') {
+        // server.close(() => {
+        //   process.exit(1);
+        // });
+      }
     });
 
   } catch (error) {
     logger.error('Unable to start server:', error);
-    process.exit(1);
+    // process.exit(1);
   }
 };
 
@@ -82,7 +88,7 @@ startServer();
 
 // Handle uncaught exceptions
 process.on('uncaughtException', (err: Error) => {
-  logger.error('UNCAUGHT EXCEPTION! 💥 Shutting down...');
+  logger.error('UNCAUGHT EXCEPTION! 💥');
   logger.error(err.name, err.message);
-  process.exit(1);
+  // process.exit(1);
 });

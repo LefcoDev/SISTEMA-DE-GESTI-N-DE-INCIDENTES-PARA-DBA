@@ -2,9 +2,11 @@ import { Fragment, useState, useEffect } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { XMarkIcon, PlayIcon, ArrowDownTrayIcon } from '@heroicons/react/24/outline';
 import api from '../../lib/axios';
+import PasswordInput from '../../components/PasswordInput';
 import { Script } from '../../services/script.service';
 import { saveAs } from 'file-saver';
 import * as XLSX from 'xlsx';
+import { useModal } from '../../context/ModalContext';
 
 interface Server {
   id: number;
@@ -20,8 +22,7 @@ interface ScriptExecutionModalProps {
 }
 
 export default function ScriptExecutionModal({ isOpen, onClose, script }: ScriptExecutionModalProps) {
-  const [servers, setServers] = useState<Server[]>([]);
-  const [selectedServer, setSelectedServer] = useState<number>(0);
+  const [servers, setServers] = useState<Server[]>([]);  const { showModal } = useModal();  const [selectedServer, setSelectedServer] = useState<number>(0);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -48,6 +49,26 @@ export default function ScriptExecutionModal({ isOpen, onClose, script }: Script
     }
   }, [isOpen]);
 
+  const executeScript = async () => {
+    if (!script) return;
+    setLoading(true);
+    setError(null);
+    setResults(null);
+
+    try {
+      const response = await api.post(`/scripts/${script.id}/execute`, {
+        serverId: selectedServer,
+        username,
+        password
+      });
+      setResults(response.data.results);
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Error executing script');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleExecute = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!script || !selectedServer) return;
@@ -65,28 +86,18 @@ export default function ScriptExecutionModal({ isOpen, onClose, script }: Script
     const isDestructive = destructivePatterns.some(pattern => pattern.test(script.code));
 
     if (isDestructive) {
-      const confirmed = window.confirm(
-        'ADVERTENCIA: Este script contiene comandos que podrían modificar o eliminar datos (DDL/DML).\n\n¿Está seguro de que desea ejecutarlo en el servidor seleccionado?'
-      );
-      if (!confirmed) return;
-    }
-
-    setLoading(true);
-    setError(null);
-    setResults(null);
-
-    try {
-      const response = await api.post(`/scripts/${script.id}/execute`, {
-        serverId: selectedServer,
-        username,
-        password
+      showModal({
+        title: 'Advertencia de Seguridad',
+        message: 'Este script contiene comandos que podrían modificar o eliminar datos (DDL/DML).\n\n¿Está seguro de que desea ejecutarlo en el servidor seleccionado?',
+        type: 'warning',
+        confirmText: 'Ejecutar de todos modos',
+        cancelText: 'Cancelar',
+        onConfirm: executeScript
       });
-      setResults(response.data.results);
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Error executing script');
-    } finally {
-      setLoading(false);
+      return;
     }
+
+    await executeScript();
   };
 
   const exportToCSV = () => {
@@ -173,13 +184,18 @@ export default function ScriptExecutionModal({ isOpen, onClose, script }: Script
                           </div>
                           <div>
                             <label className="block text-sm font-medium text-gray-700">Contraseña DB</label>
-                            <input
-                              type="password"
-                              required
-                              value={password}
-                              onChange={(e) => setPassword(e.target.value)}
-                              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border p-2"
-                            />
+                            <div className="mt-1">
+                              <PasswordInput
+                                id="db_password"
+                                name="db_password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                required
+                                placeholder="Contraseña de la base de datos"
+                                autoComplete="off"
+                                className="border p-2"
+                              />
+                            </div>
                           </div>
                         </div>
 

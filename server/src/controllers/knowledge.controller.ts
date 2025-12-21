@@ -132,8 +132,9 @@ export const getNuggetById = async (req: Request, res: Response) => {
 export const updateNugget = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const { tags, ...updateData } = req.body;
+    const { tags, applicable_to, external_references, ...updateData } = req.body;
     const userId = req.user?.id;
+    
     const nugget = await KnowledgeNugget.findByPk(id);
 
     if (!nugget) return res.status(404).json({ message: 'Nugget not found' });
@@ -143,7 +144,20 @@ export const updateNugget = async (req: Request, res: Response) => {
       return res.status(403).json({ message: 'Not authorized' });
     }
 
-    await nugget.update(updateData);
+    // Stringify JSON fields for TEXT columns
+    const processedData: any = { ...updateData };
+    if (applicable_to !== undefined) {
+      processedData.applicable_to = Array.isArray(applicable_to) 
+        ? JSON.stringify(applicable_to) 
+        : applicable_to;
+    }
+    if (external_references !== undefined) {
+      processedData.external_references = Array.isArray(external_references)
+        ? JSON.stringify(external_references)
+        : external_references;
+    }
+
+    await nugget.update(processedData);
 
     if (tags && Array.isArray(tags)) {
       const tagInstances = [];

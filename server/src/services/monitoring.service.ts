@@ -1,6 +1,8 @@
 import { Sequelize } from 'sequelize';
 import { Server, ServerHealth, Incident, User } from '../models';
 import { IncidentService } from './incident.service';
+import notificationService from './notification.service';
+import logger from '../utils/logger';
 
 export class MonitoringService {
   private incidentService: IncidentService;
@@ -90,16 +92,42 @@ export class MonitoringService {
       checked_at: new Date()
     });
 
-    // Update server last check
-    await server.update({ last_check: new Date() });
+    // Determine current status
+    const currentStatus = (isServerReachable && isOnline) ? 'online' : 'offline';
+    const previousStatus = server.last_status;
+
+    // Update server last check and status
+    await server.update({ 
+      last_check: new Date(),
+      last_status: currentStatus
+    });
+
+    // Determine if we should send notification
+    // First time (previousStatus is null): Only alert if server is DOWN
+    // After first time: Only alert if status CHANGED
+    const isFirstCheck = previousStatus === null;
+    const statusChanged = previousStatus !== null && previousStatus !== currentStatus;
+    const shouldAlert = (isFirstCheck && currentStatus === 'offline') || statusChanged;
+
+    console.log(`Status check for ${server.name}: Previous=${previousStatus}, Current=${currentStatus}, FirstCheck=${isFirstCheck}, Changed=${statusChanged}, ShouldAlert=${shouldAlert}`);
 
     // Handle Incident Creation/Resolution
     if (!isServerReachable) {
-      await this.handleServerDown(server, "Server Host Unreachable (Ping Failed)");
+      if (shouldAlert) {
+        console.log(`Sending alert: Server ${server.name} is unreachable`);
+        await this.handleServerDown(server, "Server Host Unreachable (Ping Failed)");
+      }
     } else if (!isOnline) {
-      await this.handleServerDown(server, "Database Service Unreachable (Port Closed): " + errorMessage);
+      if (shouldAlert) {
+        console.log(`Sending alert: Database ${server.name} service is down`);
+        await this.handleServerDown(server, "Database Service Unreachable (Port Closed): " + errorMessage);
+      }
     } else {
-      await this.handleServerRecovery(server);
+      // Server is online - only notify if it was previously offline (recovery)
+      if (statusChanged && previousStatus === 'offline') {
+        console.log(`Sending recovery alert: Server ${server.name} is back online`);
+        await this.handleServerRecovery(server);
+      }
     }
 
     return { server: server.name, isOnline, isServerReachable, responseTime };
@@ -203,7 +231,9 @@ export class MonitoringService {
       exec(commandInline, (error: any, stdout: string, stderr: string) => {
         if (error) {
           console.log(`Oracle Deep Check failed: ${error.message}`);
-          reject(new Error(`Database Connection Failed: ${error.message}`));
+          // Clean error message - remove connection string with credentials
+          const cleanMessage = error.message.replace(/sqlplus -L ".*?"/, 'sqlplus -L [credentials hidden]');
+          reject(new Error(`Database Connection Failed: SELECT 1 FROM DUAL;`));
           return;
         }
         
@@ -212,8 +242,10 @@ export class MonitoringService {
            const match = stdout.match(/(ORA-\d+)/);
            const oraError = match ? match[1] : "Unknown ORA Error";
            reject(new Error(`Database Error: ${oraError}`));
+           return;
         } else if (stdout && stdout.includes("1")) {
            resolve();
+           return;
         } else {
            // Fallback if we connected but didn't get expected output
            // If sqlplus didn't return error code, it might be fine.
@@ -221,7 +253,7 @@ export class MonitoringService {
            if (stdout.includes("Connected to")) {
              resolve();
            } else {
-             reject(new Error("Database Connection: Unexpected output"));
+             reject(new Error("Database Connection Failed: SELECT 1 FROM DUAL;"));
            }
         }
       });
@@ -257,59 +289,129 @@ export class MonitoringService {
 
   private async handleServerDown(server: Server, error: string) {
     try {
+      console.log(`[handleServerDown] Processing alert for ${server.name}`);
+      
+      // Determine if it's a database or server based on engine_type
+      const isDatabase = ['oracle', 'mysql', 'postgresql', 'sqlserver', 'mongodb'].includes(server.engine_type.toLowerCase());
+      const alertTitle = isDatabase ? 'BD Offline Alert' : 'Server Offline Alert';
+      const entityType = isDatabase ? 'Base de Datos' : 'Servidor';
+
+      // ALWAYS send monitoring alerts (independent of incident creation)
+      const allUsers = await User.findAll();
+      console.log(`[handleServerDown] Found ${allUsers.length} users to notify`);
+
+      if (allUsers.length > 0) {
+        const userIds = allUsers.map(u => u.id);
+        
+        console.log(`[handleServerDown] Sending monitoring alert to users: ${userIds.join(', ')}`);
+        
+        // Send monitoring alert notification
+        await notificationService.createMonitoringAlert(userIds, {
+          serverName: server.name,
+          serverType: server.engine_type,
+          status: 'Offline',
+          message: error,
+        });
+
+        logger.info(`Sent monitoring alerts to ${userIds.length} users for server ${server.name}`);
+      } else {
+        console.warn(`[handleServerDown] No users found to notify!`);
+      }
+
       // Check if there is already an open incident for this server
       const openIncident = await Incident.findOne({
         where: {
           server_id: server.id,
           status: ['new', 'in_progress', 'on_hold'],
-          title: 'Server Offline Alert'
+          title: alertTitle
         }
       });
 
+      console.log(`[handleServerDown] Open incident exists: ${!!openIncident}`);
+
+      // Create incident only if one doesn't exist (incidents are just for tracking)
       if (!openIncident) {
         // Find a user to assign as creator (System or Admin)
         const systemUser = await User.findOne({ order: [['id', 'ASC']] });
         const userId = systemUser ? systemUser.id : 1;
 
-        // Create new incident
+        // Create new incident (this will trigger incident notification separately)
         await this.incidentService.create({
-          title: 'Server Offline Alert',
-          description: `Server ${server.name} (${server.host}) is unreachable.\nError: ${error}`,
+          title: alertTitle,
+          description: `${entityType} ${server.name} (${server.host}) is unreachable.\nError: ${error}`,
           server_id: server.id,
           type: 'availability',
           severity: server.environment === 'production' ? 'critical' : 'high',
           status: 'new',
-          created_by: userId, // This will be overridden by the second arg in service, but good to have
+          created_by: userId,
           detected_at: new Date()
-        }, userId); // Assign to found user
+        }, userId);
+
+        console.log(`[handleServerDown] Created new incident for ${server.name}`);
+      } else {
+        console.log(`[handleServerDown] Incident already exists, not creating duplicate`);
       }
     } catch (err: any) {
-      console.error(`Error in handleServerDown for server ${server.name}:`, err);
+      console.error(`[handleServerDown] ERROR for server ${server.name}:`, err);
+      console.error(err.stack);
       // Do not throw, so the monitoring check can complete and return status
     }
   }
 
   private async handleServerRecovery(server: Server) {
     try {
-      // Find open incident to auto-resolve or add note
+      console.log(`[handleServerRecovery] Processing recovery for ${server.name}`);
+      
+      // Determine if it's a database or server based on engine_type
+      const isDatabase = ['oracle', 'mysql', 'postgresql', 'sqlserver', 'mongodb'].includes(server.engine_type.toLowerCase());
+      const alertTitle = isDatabase ? 'BD Offline Alert' : 'Server Offline Alert';
+
+      // ALWAYS send recovery alerts (independent of incident resolution)
+      const allUsers = await User.findAll();
+      console.log(`[handleServerRecovery] Found ${allUsers.length} users to notify`);
+
+      if (allUsers.length > 0) {
+        const userIds = allUsers.map(u => u.id);
+        
+        console.log(`[handleServerRecovery] Sending recovery alert to users: ${userIds.join(', ')}`);
+        
+        await notificationService.createMonitoringAlert(userIds, {
+          serverName: server.name,
+          serverType: server.engine_type,
+          status: 'Recovered',
+          message: 'Server is now online and responding',
+        });
+
+        logger.info(`Sent recovery notification to ${userIds.length} users for server ${server.name}`);
+      } else {
+        console.warn(`[handleServerRecovery] No users found to notify!`);
+      }
+
+      // Find open incident to auto-resolve (incidents are just for tracking)
       const openIncident = await Incident.findOne({
         where: {
           server_id: server.id,
           status: ['new', 'in_progress', 'on_hold'],
-          title: 'Server Offline Alert'
+          title: alertTitle
         }
       });
 
+      console.log(`[handleServerRecovery] Open incident exists: ${!!openIncident}`);
+
       if (openIncident) {
-        // We could auto-resolve, but maybe just add a note?
-        // Let's auto-resolve for now as it's a monitoring system
+        // Auto-resolve the incident
         await openIncident.update({
           status: 'resolved',
           description: openIncident.description + `\n\n[System]: Server recovered at ${new Date().toISOString()}`
         });
+
+        console.log(`[handleServerRecovery] Resolved incident for ${server.name}`);
+      } else {
+        console.log(`[handleServerRecovery] No open incident found for ${server.name}`);
       }
     } catch (err: any) {
-      console.error(`Error in handleServerRecovery for server ${server.name}:`, err);
+      console.error(`[handleServerRecovery] ERROR for server ${server.name}:`, err);
+      console.error(err.stack);
     }
   }
 }

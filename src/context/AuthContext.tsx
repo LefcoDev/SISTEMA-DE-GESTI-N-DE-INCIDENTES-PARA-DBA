@@ -1,11 +1,14 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import api from '../lib/axios';
 
-interface User {
+export interface User {
   id: number;
   username: string;
   email: string;
   role: string;
+  full_name?: string;
+  profile_picture?: string;
+  created_at?: string;
 }
 
 interface AuthContextType {
@@ -39,8 +42,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             setUser(response.data);
           }
           setToken(storedToken);
-        } catch (error) {
-          console.error('Auth initialization failed:', error);
+        } catch (error: any) {
+          // Only log error if it's not a 401 (Unauthorized) which is expected when token expires
+          if (error.response && error.response.status !== 401) {
+            console.error('Auth initialization failed:', error);
+          }
           localStorage.removeItem('token');
           setToken(null);
           setUser(null);

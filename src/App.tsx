@@ -2,7 +2,9 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { ModalProvider } from './context/ModalContext';
+import { MenuProvider } from './context/MenuContext';
 import GlobalModal from './components/ui/GlobalModal';
+import UpdateNotification from './components/UpdateNotification';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import MainLayout from './components/layout/MainLayout';
 import Login from './pages/auth/Login';
@@ -28,8 +30,10 @@ function App() {
     <ThemeProvider>
       <AuthProvider>
         <ModalProvider>
-          <GlobalModal />
-          <Routes>
+          <MenuProvider>
+            <GlobalModal />
+            <UpdateNotification />
+            <Routes>
             <Route path="/login" element={<Login />} />
             
             <Route
@@ -41,8 +45,10 @@ function App() {
               }
             >
               <Route index element={<Navigate to="/dashboard" replace />} />
+              <Route path="audit" element={<AuditLogList />} />
               <Route path="dashboard" element={<Dashboard />} />
               <Route path="monitoring" element={<MonitoringDashboard />} />
+              <Route path="search" element={<Search />} />
               <Route path="notes" element={<NotesDashboard />} />
               <Route path="reminders" element={<RemindersDashboard />} />
               <Route path="knowledge" element={<KnowledgeDashboard />} />
@@ -56,12 +62,9 @@ function App() {
               <Route path="solutions/:id/edit" element={<SolutionForm />} />
               <Route path="scripts" element={<ScriptList />} />
               <Route path="reports" element={<Reports />} />
-              <Route path="search" element={<Search />} />
-              <Route path="settings" element={<Settings />} />
-              <Route path="audit" element={<AuditLogList />} />
+              <Route path="settings" element={<Settings />} /> 
             </Route>
-          </Routes>
-        </ModalProvider>
+          </Routes>          </MenuProvider>        </ModalProvider>
       </AuthProvider>
     </ThemeProvider>
   );

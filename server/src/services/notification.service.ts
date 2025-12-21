@@ -3,6 +3,7 @@ import NotificationQueue from '../models/NotificationQueue';
 import User from '../models/User';
 import { Op } from 'sequelize';
 import logger from '../utils/logger';
+import emailService from './email.service';
 
 export class NotificationService {
   // Check for reminders that need to be triggered
@@ -22,7 +23,7 @@ export class NotificationService {
             { snooze_until: { [Op.lte]: now } }
           ]
         } as any,
-        include: [{ model: User, attributes: ['id', 'full_name', 'email'] }]
+        include: [{ model: User, attributes: ['id', 'full_name', 'email', 'phone_number'] }]
       });
 
       for (const reminder of reminders) {
@@ -61,9 +62,133 @@ export class NotificationService {
       });
 
       logger.info(`Created notification for reminder ${reminder.id}`);
+      
+      // Send email if user has it configured
+      const user = await User.findByPk(reminder.created_by);
+      if (user?.email) {
+        await emailService.sendReminderNotification(user.email, {
+          title: reminder.title,
+          description: reminder.description,
+          scheduled_at: reminder.scheduled_at,
+        });
+      }
+
       return notification;
     } catch (error) {
       logger.error(`Error creating notification for reminder ${reminder.id}:`, error);
+      throw error;
+    }
+  }
+
+  // Create notification for incident
+  async createIncidentNotification(
+    userId: number | number[],
+    type: 'incident_created' | 'incident_assigned',
+    incidentData: {
+      id: number;
+      title: string;
+      severity: string;
+      description?: string;
+      assigned_to?: string;
+    }
+  ) {
+    try {
+      const userIds = Array.isArray(userId) ? userId : [userId];
+      const notifications = [];
+
+      for (const uid of userIds) {
+        const notification = await NotificationQueue.create({
+          user_id: uid,
+          type,
+          title: `Incidente #${incidentData.id}: ${incidentData.title}`,
+          message: incidentData.description || 'Nuevo incidente registrado',
+          entity_type: 'incident',
+          entity_id: incidentData.id,
+          action_url: `/incidents/${incidentData.id}`,
+          status: 'pending',
+          priority: incidentData.severity === 'critical' ? 'critical' : incidentData.severity === 'high' ? 'high' : 'medium',
+          scheduled_at: new Date(),
+        });
+
+        notifications.push(notification);
+
+        // Send email and SMS
+        const user = await User.findByPk(uid);
+        if (user?.email) {
+          console.log(`[createIncidentNotification] Sending to user ${uid}: ${user.email} (phone: ${user.phone_number || 'none'})`);
+          try {
+            const result = await emailService.sendIncidentNotification(user.email, user.phone_number, incidentData);
+            console.log(`[createIncidentNotification] Result for user ${uid}:`, JSON.stringify(result));
+            logger.info(`Incident notification sent to ${user.email} - Email: ${result.email}, SMS: ${result.sms}`);
+          } catch (emailError: any) {
+            console.error(`[createIncidentNotification] ERROR sending to user ${uid}:`, emailError);
+            console.error(emailError.stack);
+          }
+        } else {
+          console.warn(`[createIncidentNotification] User ${uid} has no email configured`);
+        }
+      }
+
+      logger.info(`Created ${notifications.length} incident notifications`);
+      return notifications;
+    } catch (error) {
+      logger.error('Error creating incident notifications:', error);
+      throw error;
+    }
+  }
+
+  // Create notification for monitoring alert
+  async createMonitoringAlert(
+    userIds: number[],
+    alertData: {
+      serverName: string;
+      serverType: string;
+      status: string;
+      message: string;
+    }
+  ) {
+    try {
+      const notifications = [];
+
+      for (const userId of userIds) {
+        const notification = await NotificationQueue.create({
+          user_id: userId,
+          type: 'monitoring_alert',
+          title: `Alerta: ${alertData.serverName}`,
+          message: alertData.message,
+          entity_type: 'server',
+          action_url: '/monitoring',
+          status: 'pending',
+          priority: 'high',
+          scheduled_at: new Date(),
+        });
+
+        notifications.push(notification);
+
+        // Send email and SMS
+        const user = await User.findByPk(userId);
+        if (user?.email) {
+          console.log(`[createMonitoringAlert] Sending to user ${userId}: ${user.email} (phone: ${user.phone_number || 'none'})`);
+          try {
+            const result = await emailService.sendMonitoringAlert(user.email, user.phone_number, {
+              ...alertData,
+              timestamp: new Date(),
+            });
+            console.log(`[createMonitoringAlert] Result for user ${userId}:`, JSON.stringify(result));
+            logger.info(`Alert sent to ${user.email} - Email: ${result.email}, SMS: ${result.sms}`);
+          } catch (emailError: any) {
+            console.error(`[createMonitoringAlert] ERROR sending to user ${userId}:`, emailError);
+            console.error(emailError.stack);
+          }
+        } else {
+          console.warn(`[createMonitoringAlert] User ${userId} has no email configured`);
+        }
+      }
+
+      logger.info(`Created ${notifications.length} monitoring alert notifications`);
+      return notifications;
+    } catch (error) {
+      logger.error('Error creating monitoring alert notifications:', error);
       throw error;
     }
   }

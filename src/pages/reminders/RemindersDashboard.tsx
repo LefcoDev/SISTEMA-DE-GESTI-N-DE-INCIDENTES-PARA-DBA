@@ -4,8 +4,10 @@ import { Reminder, CreateReminderDTO, ReminderPriority } from '../../features/re
 import { remindersService } from '../../features/reminders/services/reminders.service';
 import { ReminderItem } from '../../features/reminders/components/ReminderItem';
 import { ReminderForm } from '../../features/reminders/components/ReminderForm';
+import { useModal } from '../../context/ModalContext';
 
 export const RemindersDashboard: React.FC = () => {
+  const { showModal } = useModal();
   const [reminders, setReminders] = useState<Reminder[]>([]);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingReminder, setEditingReminder] = useState<Reminder | null>(null);
@@ -45,14 +47,22 @@ export const RemindersDashboard: React.FC = () => {
     }
   };
 
-  const handleDelete = async (id: number) => {
-    if (!window.confirm('Are you sure you want to delete this reminder?')) return;
-    try {
-      await remindersService.delete(id);
-      setReminders(reminders.filter(r => r.id !== id));
-    } catch (error) {
-      console.error('Failed to delete reminder:', error);
-    }
+  const handleDelete = (id: number) => {
+    showModal({
+      title: 'Eliminar Recordatorio',
+      message: '¿Estás seguro de que deseas eliminar este recordatorio?',
+      type: 'confirm',
+      confirmText: 'Eliminar',
+      cancelText: 'Cancelar',
+      onConfirm: async () => {
+        try {
+          await remindersService.delete(id);
+          setReminders(reminders.filter(r => r.id !== id));
+        } catch (error) {
+          console.error('Failed to delete reminder:', error);
+        }
+      }
+    });
   };
 
   const handleComplete = async (id: number) => {

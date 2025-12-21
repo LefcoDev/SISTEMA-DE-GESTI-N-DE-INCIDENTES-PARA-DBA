@@ -1,14 +1,13 @@
 import { useState, useEffect } from 'react';
 import { saveAs } from 'file-saver';
 import * as XLSX from 'xlsx';
-import { incidentService, Incident } from '../../services/incident.service';
+import { Incident } from '../../services/incident.service';
 import { serverService, Server } from '../../services/server.service';
 import { reportService, TrendAnalysis } from '../../services/report.service';
 import { useModal } from '../../context/ModalContext';
 import { DocumentArrowDownIcon, TableCellsIcon, ChartBarIcon, ArrowTrendingUpIcon } from '@heroicons/react/24/outline';
 import api from '../../lib/axios';
-import { format } from 'date-fns';
-import { es } from 'date-fns/locale';
+import { formatDate } from '../../lib/dateUtils';
 
 interface ReportStats {
   total: number;
@@ -400,14 +399,14 @@ export default function Reports() {
                   <p className="text-sm text-gray-500">Período Actual</p>
                   <p className="text-2xl font-bold text-indigo-600">{trendData.currentStats.total} Incidentes</p>
                   <p className="text-xs text-gray-400">
-                    {format(new Date(trendData.period.start), 'dd/MM/yyyy')} - {format(new Date(trendData.period.end), 'dd/MM/yyyy')}
+                    {formatDate(new Date(trendData.period.start), 'short')} - {formatDate(new Date(trendData.period.end), 'short')}
                   </p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Período Anterior</p>
                   <p className="text-2xl font-bold text-gray-600">{trendData.previousStats.total} Incidentes</p>
                   <p className="text-xs text-gray-400">
-                    {format(new Date(trendData.previousPeriod.start), 'dd/MM/yyyy')} - {format(new Date(trendData.previousPeriod.end), 'dd/MM/yyyy')}
+                    {formatDate(new Date(trendData.previousPeriod.start), 'short')} - {formatDate(new Date(trendData.previousPeriod.end), 'short')}
                   </p>
                 </div>
               </div>

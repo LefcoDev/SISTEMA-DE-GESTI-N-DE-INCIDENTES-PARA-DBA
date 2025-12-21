@@ -3,7 +3,7 @@ import { Note, NoteColor } from '../types/note.types';
 import { TrashIcon, PencilSquareIcon, MapPinIcon, ArchiveBoxIcon } from '@heroicons/react/24/outline';
 import { MapPinIcon as MapPinSolidIcon } from '@heroicons/react/24/solid';
 import clsx from 'clsx';
-import { format } from 'date-fns';
+import { formatDate } from '../../../lib/dateUtils';
 
 interface StickyNoteProps {
   note: Note;
@@ -58,7 +58,7 @@ export const StickyNote: React.FC<StickyNoteProps> = ({ note, onEdit, onDelete, 
       )}
 
       <div className="mt-auto pt-2 border-t border-black/10 flex justify-between items-center text-xs text-gray-600">
-        <span>{note.updated_at ? format(new Date(note.updated_at), 'MMM d, yyyy') : 'No date'}</span>
+        <span>{note.updated_at ? formatDate(new Date(note.updated_at), 'long') : 'No date'}</span>
         
         <div className="flex space-x-2">
           <button 

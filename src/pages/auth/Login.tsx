@@ -2,14 +2,25 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../lib/axios';
+import PasswordInput from '../../components/PasswordInput';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [rememberUser, setRememberUser] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { login, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Cargar usuario guardado si existe
+    const savedEmail = localStorage.getItem('rememberedEmail');
+    if (savedEmail) {
+      setEmail(savedEmail);
+      setRememberUser(true);
+    }
+  }, []);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -25,6 +36,14 @@ export default function Login() {
     try {
       const response = await api.post('/auth/login', { email, password });
       const { token, user } = response.data.data;
+      
+      // Guardar o eliminar usuario según checkbox
+      if (rememberUser) {
+        localStorage.setItem('rememberedEmail', email);
+      } else {
+        localStorage.removeItem('rememberedEmail');
+      }
+      
       console.log('Login successful, updating context...', { token, user });
       login(token, user);
       console.log('Context updated, navigating to dashboard...');
@@ -32,8 +51,6 @@ export default function Login() {
     } catch (err: any) {
       console.error('Login error:', err);
       setError(err.response?.data?.message || 'Error al iniciar sesión');
-      // Do not clear email, only password if needed, but better to keep both for UX
-      // setPassword(''); 
     } finally {
       setLoading(false);
     }
@@ -45,7 +62,7 @@ export default function Login() {
         <div className="mx-auto h-16 w-16 flex items-center justify-center rounded-full bg-gray-900 p-2">
           <img
             className="h-10 w-auto"
-            src="/icon.svg"
+            src="icon.svg"
             alt="DBA Incident Manager"
           />
         </div>
@@ -81,17 +98,31 @@ export default function Login() {
               </label>
             </div>
             <div className="mt-2">
-              <input
+              <PasswordInput
                 id="password"
                 name="password"
-                type="password"
-                autoComplete="current-password"
-                required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 px-3"
+                placeholder="Ingresa tu contraseña"
+                required
+                autoComplete="current-password"
+                className="px-3"
               />
             </div>
+          </div>
+
+          <div className="flex items-center">
+            <input
+              id="remember-user"
+              name="remember-user"
+              type="checkbox"
+              checked={rememberUser}
+              onChange={(e) => setRememberUser(e.target.checked)}
+              className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
+            />
+            <label htmlFor="remember-user" className="ml-2 block text-sm text-gray-900">
+              Recordar usuario
+            </label>
           </div>
 
           {error && (

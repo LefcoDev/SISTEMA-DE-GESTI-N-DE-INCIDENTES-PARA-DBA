@@ -18,7 +18,8 @@ app.use(cors());
 app.use(compression());
 
 // Serve static files
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+const uploadDir = process.env.UPLOAD_DIR || path.join(__dirname, '../uploads');
+app.use('/uploads', express.static(uploadDir));
 
 // Rate Limiting
 const limiter = rateLimit({

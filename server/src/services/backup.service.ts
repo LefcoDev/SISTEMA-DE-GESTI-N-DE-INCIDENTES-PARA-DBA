@@ -9,9 +9,9 @@ export class BackupService {
   private backupPath: string;
 
   constructor() {
-    this.backupPath = path.join(process.cwd(), 'backups');
+    this.backupPath = process.env.BACKUP_DIR || path.join(process.cwd(), 'backups');
     if (!fs.existsSync(this.backupPath)) {
-      fs.mkdirSync(this.backupPath);
+      fs.mkdirSync(this.backupPath, { recursive: true });
     }
   }
 

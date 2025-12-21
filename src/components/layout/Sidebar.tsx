@@ -1,42 +1,10 @@
 import { Fragment } from 'react';
 import { NavLink } from 'react-router-dom';
 import { Dialog, Transition } from '@headlessui/react';
-import {
-  XMarkIcon,
-  HomeIcon,
-  ServerIcon,
-  ExclamationTriangleIcon,
-  BookOpenIcon,
-  CommandLineIcon,
-  ChartBarIcon,
-  DocumentTextIcon,
-  MagnifyingGlassIcon,
-  Cog6ToothIcon,
-  ShieldCheckIcon,
-  SignalIcon,
-  PencilSquareIcon,
-  BellIcon,
-  AcademicCapIcon,
-  CalendarIcon,
-} from '@heroicons/react/24/outline';
+import { XMarkIcon } from '@heroicons/react/24/outline';
 import clsx from 'clsx';
 import { useAuth } from '../../context/AuthContext';
-
-const navigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
-  { name: 'Monitoreo', href: '/monitoring', icon: SignalIcon },
-  { name: 'Notas', href: '/notes', icon: PencilSquareIcon },
-  { name: 'Recordatorios', href: '/reminders', icon: BellIcon },
-  { name: 'Aprendizaje', href: '/knowledge', icon: AcademicCapIcon },
-  { name: 'Bitácora', href: '/journal', icon: CalendarIcon },
-  { name: 'Incidentes', href: '/incidents', icon: ExclamationTriangleIcon },
-  { name: 'Servidores', href: '/servers', icon: ServerIcon },
-  { name: 'Soluciones', href: '/solutions', icon: BookOpenIcon },
-  { name: 'Scripts', href: '/scripts', icon: CommandLineIcon },
-  { name: 'Reportes', href: '/reports', icon: DocumentTextIcon },
-  { name: 'Búsqueda', href: '/search', icon: MagnifyingGlassIcon },
-  { name: 'Configuración', href: '/settings', icon: Cog6ToothIcon },
-];
+import { useMenu } from '../../context/MenuContext';
 
 interface SidebarProps {
   sidebarOpen: boolean;
@@ -45,11 +13,16 @@ interface SidebarProps {
 
 export default function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
   const { user } = useAuth();
+  const { menuItems, getIconComponent } = useMenu();
 
-  const filteredNavigation = [
-    ...navigation,
-    ...(user?.role === 'admin' ? [{ name: 'Auditoría', href: '/audit', icon: ShieldCheckIcon }] : [])
-  ];
+  const filteredNavigation = menuItems
+    .filter(item => item.visible)
+    .filter(item => item.id !== 'audit' || user?.role === 'admin')
+    .map(item => ({
+      ...item,
+      icon: getIconComponent(item.iconName)
+    }));
+
 
   return (
     <>
@@ -99,7 +72,7 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
                   <div className="flex h-16 shrink-0 items-center">
                     <img
                       className="h-8 w-auto"
-                      src="/icon.svg"
+                      src="icon.svg"
                       alt="DBA Incident Manager"
                     />
                     <span className="ml-4 text-white font-bold">DBA Manager</span>
@@ -143,7 +116,7 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
           <div className="flex h-16 shrink-0 items-center">
             <img
               className="h-8 w-auto"
-              src="/icon.svg"
+              src="icon.svg"
               alt="DBA Incident Manager"
             />
             <span className="ml-4 text-white font-bold text-lg">DBA Manager</span>

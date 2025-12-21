@@ -2,25 +2,120 @@ import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { useModal } from '../../context/ModalContext';
-import { UserCircleIcon, BellIcon, ShieldCheckIcon, ComputerDesktopIcon, TagIcon, ArchiveBoxIcon, TrashIcon, ArrowPathIcon, CameraIcon, CheckCircleIcon, XCircleIcon, UsersIcon, PlusIcon, PencilSquareIcon } from '@heroicons/react/24/outline';
+import { useMenu, MenuItem } from '../../context/MenuContext';
+import { UserCircleIcon, ShieldCheckIcon, ComputerDesktopIcon, TagIcon, ArchiveBoxIcon, TrashIcon, ArrowPathIcon, CameraIcon, CheckCircleIcon, XCircleIcon, UsersIcon, PlusIcon, PencilSquareIcon, Bars3Icon, ChevronUpIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
+import PasswordInput from '../../components/PasswordInput';
 import { tagService, Tag } from '../../services/tag.service';
 import { backupService, Backup } from '../../services/backup.service';
 import { userService, User as UserType } from '../../services/user.service';
-import { format } from 'date-fns';
+import { formatDate } from '../../lib/dateUtils';
 import api from '../../lib/axios';
 import { Dialog } from '@headlessui/react';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  useSortable
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+
+function SortableMenuItem({ item, toggleVisibility }: { item: MenuItem; toggleVisibility: (id: string) => void }) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging
+  } = useSortable({ id: item.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    zIndex: isDragging ? 1 : 0,
+    position: 'relative' as const,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg ${isDragging ? 'shadow-lg ring-2 ring-indigo-500 opacity-80' : ''}`}
+    >
+      <div className="flex items-center space-x-3 flex-1">
+        <div
+          {...attributes}
+          {...listeners}
+          className="cursor-grab active:cursor-grabbing p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+        >
+          <Bars3Icon className="h-5 w-5" />
+        </div>
+        <span className="text-sm font-medium text-gray-900 dark:text-white">{item.name}</span>
+        {item.required && <span className="text-xs text-gray-400 italic">(Requerido)</span>}
+      </div>
+      
+      <button
+        type="button"
+        onClick={() => !item.required && toggleVisibility(item.id)}
+        disabled={item.required}
+        className={`${
+          item.visible ? 'bg-indigo-600' : 'bg-gray-200'
+        } ${item.required ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} relative inline-flex h-6 w-11 flex-shrink-0 rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2`}
+        role="switch"
+        aria-checked={item.visible}
+      >
+        <span
+          className={`${
+            item.visible ? 'translate-x-5' : 'translate-x-0'
+          } pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out`}
+        />
+      </button>
+    </div>
+  );
+}
 
 export default function Settings() {
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const { showModal } = useModal();
+  const { menuItems, toggleVisibility, reorderItems, resetMenu } = useMenu();
   const [activeTab, setActiveTab] = useState('profile');
+  
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      const oldIndex = menuItems.findIndex((item) => item.id === active.id);
+      const newIndex = menuItems.findIndex((item) => item.id === over.id);
+      
+      reorderItems(arrayMove(menuItems, oldIndex, newIndex));
+    }
+  };
+
   
   // Profile State
   const [isEditing, setIsEditing] = useState(false);
   const [profileData, setProfileData] = useState({
     full_name: '',
     email: '',
+    phone_number: '',
     role: ''
   });
   const [passwordData, setPasswordData] = useState({
@@ -31,18 +126,19 @@ export default function Settings() {
   const [avatar, setAvatar] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [errorMessage, setErrorMessage] = useState('');
+  // const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
     if (user) {
       setProfileData({
         full_name: user.full_name || '',
         email: user.email || '',
+        phone_number: (user as any).phone_number || '',
         role: user.role || ''
       });
       // @ts-ignore
       if (user.profile_picture) {
-        const baseUrl = (import.meta.env.VITE_API_URL || 'http://localhost:3001/api').replace('/api', '');
+        const baseUrl = (import.meta.env?.VITE_API_URL || 'http://localhost:3001/api').replace('/api', '');
         // @ts-ignore
         setAvatarPreview(`${baseUrl}/${user.profile_picture}`);
       }
@@ -55,6 +151,7 @@ export default function Settings() {
       const formData = new FormData();
       formData.append('full_name', profileData.full_name);
       formData.append('email', profileData.email);
+      formData.append('phone_number', profileData.phone_number);
       // Role is not updated here for security, only admin can change roles via User Management
       if (avatar) {
         formData.append('avatar', avatar);
@@ -73,7 +170,7 @@ export default function Settings() {
     } catch (error: any) {
       console.error('Error updating profile:', error);
       const message = error.response?.data?.message || 'Error al actualizar el perfil';
-      setErrorMessage(message);
+      console.error(message);
       showModal({
         title: 'Error',
         message: message,
@@ -143,6 +240,7 @@ export default function Settings() {
     full_name: '',
     email: '',
     password: '',
+    phone_number: '',
     role: 'junior_dba'
   });
 
@@ -171,6 +269,7 @@ export default function Settings() {
         full_name: user.full_name,
         email: user.email,
         password: '', // Empty for updates unless changing
+        phone_number: user.phone_number || '',
         role: user.role
       });
     } else {
@@ -179,6 +278,7 @@ export default function Settings() {
         full_name: '',
         email: '',
         password: '',
+        phone_number: '',
         role: 'junior_dba'
       });
     }
@@ -193,6 +293,7 @@ export default function Settings() {
         const updateData: any = {
           full_name: userFormData.full_name,
           email: userFormData.email,
+          phone_number: userFormData.phone_number,
           role: userFormData.role
         };
         if (userFormData.password) {
@@ -517,6 +618,23 @@ export default function Settings() {
                       )}
                     </div>
                     <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Teléfono (Movistar Chile)</label>
+                      {isEditing ? (
+                        <div>
+                          <input
+                            type="tel"
+                            value={profileData.phone_number}
+                            onChange={(e) => setProfileData({ ...profileData, phone_number: e.target.value })}
+                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white p-2 border"
+                            placeholder="Ej: +56912345678"
+                          />
+                          <p className="mt-1 text-xs text-gray-500">Opcional. Para recibir SMS de alertas críticas.</p>
+                        </div>
+                      ) : (
+                        <div className="mt-1 text-sm text-gray-900 dark:text-white">{(user as any)?.phone_number || 'No configurado'}</div>
+                      )}
+                    </div>
+                    <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Rol</label>
                       <div className="mt-1 text-sm text-gray-900 dark:text-white capitalize p-2 border border-transparent bg-gray-50 dark:bg-gray-800 rounded-md">
                         {user?.role?.replace('_', ' ')}
@@ -544,35 +662,47 @@ export default function Settings() {
                     <div className="space-y-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Contraseña Actual</label>
-                        <input
-                          type="password"
-                          required
-                          value={passwordData.current_password}
-                          onChange={(e) => setPasswordData({ ...passwordData, current_password: e.target.value })}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white p-2 border"
-                        />
+                        <div className="mt-1">
+                          <PasswordInput
+                            id="current_password"
+                            name="current_password"
+                            value={passwordData.current_password}
+                            onChange={(e) => setPasswordData({ ...passwordData, current_password: e.target.value })}
+                            required
+                            placeholder="Contraseña actual"
+                            className="dark:bg-gray-700 dark:border-gray-600 dark:text-white p-2 border"
+                          />
+                        </div>
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Nueva Contraseña</label>
-                        <input
-                          type="password"
-                          required
-                          minLength={8}
-                          value={passwordData.new_password}
-                          onChange={(e) => setPasswordData({ ...passwordData, new_password: e.target.value })}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white p-2 border"
-                        />
+                        <div className="mt-1">
+                          <PasswordInput
+                            id="new_password"
+                            name="new_password"
+                            value={passwordData.new_password}
+                            onChange={(e) => setPasswordData({ ...passwordData, new_password: e.target.value })}
+                            required
+                            placeholder="Nueva contraseña (mínimo 8 caracteres)"
+                            autoComplete="new-password"
+                            className="dark:bg-gray-700 dark:border-gray-600 dark:text-white p-2 border"
+                          />
+                        </div>
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Confirmar Nueva Contraseña</label>
-                        <input
-                          type="password"
-                          required
-                          minLength={8}
-                          value={passwordData.confirm_password}
-                          onChange={(e) => setPasswordData({ ...passwordData, confirm_password: e.target.value })}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white p-2 border"
-                        />
+                        <div className="mt-1">
+                          <PasswordInput
+                            id="confirm_password"
+                            name="confirm_password"
+                            value={passwordData.confirm_password}
+                            onChange={(e) => setPasswordData({ ...passwordData, confirm_password: e.target.value })}
+                            required
+                            placeholder="Confirmar nueva contraseña"
+                            autoComplete="new-password"
+                            className="dark:bg-gray-700 dark:border-gray-600 dark:text-white p-2 border"
+                          />
+                        </div>
                       </div>
                       <div>
                         <button
@@ -653,7 +783,7 @@ export default function Settings() {
                               </span>
                             </td>
                             <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                              {format(new Date(u.created_at), 'dd/MM/yyyy')}
+                              {formatDate(new Date(u.created_at), 'short')}
                             </td>
                             <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                               <div className="flex justify-end gap-2">
@@ -827,7 +957,7 @@ export default function Settings() {
                               {backup.filename}
                             </td>
                             <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                              {format(new Date(backup.createdAt), 'dd/MM/yyyy HH:mm:ss')}
+                              {formatDate(new Date(backup.createdAt), 'datetime')}
                             </td>
                             <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                               {(backup.size / 1024).toFixed(2)} KB
@@ -895,6 +1025,42 @@ export default function Settings() {
                       />
                     </button>
                   </div>
+
+                  <div className="mt-8 border-t border-gray-200 dark:border-gray-700 pt-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <div>
+                        <h4 className="text-base font-medium text-gray-900 dark:text-white">Personalización del Menú</h4>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">Organiza y oculta elementos del menú lateral</p>
+                      </div>
+                      <button
+                        onClick={resetMenu}
+                        className="text-sm text-indigo-600 hover:text-indigo-500 dark:text-indigo-400"
+                      >
+                        Restaurar valores por defecto
+                      </button>
+                    </div>
+
+                    <div className="space-y-2">
+                      <DndContext
+                        sensors={sensors}
+                        collisionDetection={closestCenter}
+                        onDragEnd={handleDragEnd}
+                      >
+                        <SortableContext
+                          items={menuItems.map(item => item.id)}
+                          strategy={verticalListSortingStrategy}
+                        >
+                          {menuItems.map((item) => (
+                            <SortableMenuItem
+                              key={item.id}
+                              item={item}
+                              toggleVisibility={toggleVisibility}
+                            />
+                          ))}
+                        </SortableContext>
+                      </DndContext>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -933,17 +1099,32 @@ export default function Settings() {
                   />
                 </div>
                 <div>
+                  <label className="block text-sm font-medium text-gray-700">Teléfono (Chile - Movistar)</label>
+                  <input
+                    type="tel"
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
+                    value={userFormData.phone_number}
+                    onChange={(e) => setUserFormData({ ...userFormData, phone_number: e.target.value })}
+                    placeholder="Ej: +56912345678 o 912345678"
+                  />
+                  <p className="mt-1 text-xs text-gray-500">Opcional. Para recibir SMS de alertas críticas vía Movistar Chile.</p>
+                </div>
+                <div>
                   <label className="block text-sm font-medium text-gray-700">
                     {editingUser ? 'Contraseña (dejar en blanco para mantener)' : 'Contraseña'}
                   </label>
-                  <input
-                    type="password"
-                    required={!editingUser}
-                    minLength={8}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
-                    value={userFormData.password}
-                    onChange={(e) => setUserFormData({ ...userFormData, password: e.target.value })}
-                  />
+                  <div className="mt-1">
+                    <PasswordInput
+                      id="user_password"
+                      name="user_password"
+                      value={userFormData.password}
+                      onChange={(e) => setUserFormData({ ...userFormData, password: e.target.value })}
+                      required={!editingUser}
+                      placeholder={editingUser ? 'Dejar en blanco para mantener' : 'Mínimo 8 caracteres'}
+                      autoComplete="new-password"
+                      className="p-2 border"
+                    />
+                  </div>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700">Rol</label>
