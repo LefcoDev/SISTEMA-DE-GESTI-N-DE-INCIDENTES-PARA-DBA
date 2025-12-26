@@ -24,7 +24,7 @@ export default function UpdateNotification() {
   useEffect(() => {
     // Listen for update events from Electron
     if (window.electron) {
-      window.electron.on('update-available', (info: UpdateInfo) => {
+      const offUpdateAvailable = window.electron.on('update-available', (info: UpdateInfo) => {
         // Add notification to the bell
         addSystemNotification({
           title: 'Actualización Disponible',
@@ -52,11 +52,11 @@ export default function UpdateNotification() {
         });
       });
 
-      window.electron.on('download-progress', (progress: DownloadProgress) => {
+      const offDownloadProgress = window.electron.on('download-progress', (progress: DownloadProgress) => {
         setDownloadProgress(progress);
       });
 
-      window.electron.on('update-downloaded', (info: UpdateInfo) => {
+      const offUpdateDownloaded = window.electron.on('update-downloaded', (info: UpdateInfo) => {
         setDownloading(false);
         showModal({
           title: 'Actualización Lista',
@@ -69,14 +69,30 @@ export default function UpdateNotification() {
           }
         });
       });
+      const offUpdateError = window.electron.on('update-error', (err: any) => {
+        setDownloading(false);
+        addSystemNotification({
+          title: 'Error de actualización',
+          message: String(err?.message || err || 'Error desconocido'),
+          type: 'error',
+          priority: 'high'
+        });
+      });
     }
 
     // Cleanup
     return () => {
-      if (window.electron) {
-        window.electron.removeAllListeners('update-available');
-        window.electron.removeAllListeners('download-progress');
-        window.electron.removeAllListeners('update-downloaded');
+      try {
+        if (typeof offUpdateAvailable === 'function') offUpdateAvailable();
+        if (typeof offDownloadProgress === 'function') offDownloadProgress();
+        if (typeof offUpdateDownloaded === 'function') offUpdateDownloaded();
+        if (typeof offUpdateError === 'function') offUpdateError();
+      } catch (e) {
+        // Fallback removal
+        window.electron?.removeAllListeners?.('update-available');
+        window.electron?.removeAllListeners?.('download-progress');
+        window.electron?.removeAllListeners?.('update-downloaded');
+        window.electron?.removeAllListeners?.('update-error');
       }
     };
   }, [showModal]);
