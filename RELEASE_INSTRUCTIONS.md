@@ -20,7 +20,7 @@ Abre tu terminal (PowerShell) en la carpeta del proyecto y ejecuta:
 
 ```powershell
 # Reemplaza 'ghp_...' con tu token real
-$env:GH_TOKEN="ghp_TU_TOKEN_AQUI"
+$env:GH_TOKEN="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"
 
 # Compilar y subir a GitHub Releases
 npm run build:win
