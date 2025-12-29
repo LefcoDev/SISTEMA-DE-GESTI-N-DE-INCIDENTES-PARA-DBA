@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { 
-  CheckCircleIcon, ExclamationTriangleIcon, ServerIcon, CircleStackIcon 
+import {
+  CheckCircleIcon, ExclamationTriangleIcon, ServerIcon, CircleStackIcon
 } from '@heroicons/react/24/outline';
 import { dashboardService, DashboardStats } from '../../services/dashboard.service';
 
@@ -33,9 +33,9 @@ export default function Dashboard() {
     <div className="p-6 space-y-6">
       <div className="flex items-center gap-3">
         <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-        <span className="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">v1.0.9</span>
+        <span className="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">v1.0.11</span>
       </div>
-      
+
       {/* KPI Cards */}
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
         <div className="bg-white overflow-hidden shadow rounded-lg">
@@ -126,20 +126,18 @@ export default function Dashboard() {
                     <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{server.host}</td>
                     <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{server.engine_type}</td>
                     <td className="whitespace-nowrap px-3 py-4 text-sm">
-                      <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${
-                        lastCheck?.server_reachable 
-                          ? 'bg-green-50 text-green-700 ring-green-600/20' 
-                          : 'bg-red-50 text-red-700 ring-red-600/20'
-                      }`}>
+                      <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${lastCheck?.server_reachable
+                        ? 'bg-green-50 text-green-700 ring-green-600/20'
+                        : 'bg-red-50 text-red-700 ring-red-600/20'
+                        }`}>
                         {lastCheck?.server_reachable ? 'Online' : 'Offline'}
                       </span>
                     </td>
                     <td className="whitespace-nowrap px-3 py-4 text-sm">
-                      <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${
-                        lastCheck?.is_online 
-                          ? 'bg-green-50 text-green-700 ring-green-600/20' 
-                          : 'bg-red-50 text-red-700 ring-red-600/20'
-                      }`}>
+                      <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${lastCheck?.is_online
+                        ? 'bg-green-50 text-green-700 ring-green-600/20'
+                        : 'bg-red-50 text-red-700 ring-red-600/20'
+                        }`}>
                         {lastCheck?.is_online ? 'Online' : 'Offline'}
                       </span>
                     </td>

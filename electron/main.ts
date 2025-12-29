@@ -12,10 +12,15 @@ autoUpdater.autoInstallOnAppQuit = true;
 
 // Force update check on startup
 app.on('ready', () => {
-  // Check for updates every 10 minutes
+  // Check for updates immediately (after a short delay to ensure net is ready)
+  setTimeout(() => {
+    checkForUpdates();
+  }, 10000); 
+
+  // Then check every 1 hour (changed from 10 mins to avoid spamming GitHub API rate limits in dev)
   setInterval(() => {
-    autoUpdater.checkForUpdates();
-  }, 10 * 60 * 1000);
+    checkForUpdates();
+  }, 60 * 60 * 1000);
 });
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.

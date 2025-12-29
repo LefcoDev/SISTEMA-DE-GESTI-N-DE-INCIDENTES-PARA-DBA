@@ -1,6 +1,6 @@
 {
   "name": "dba-incident-manager",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "Aplicación de escritorio para administradores de bases de datos",
   "main": "dist-electron/main.js",
   "scripts": {
@@ -28,6 +28,10 @@
   },
   "author": "DBA Tools Team",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/LefcoDev/SISTEMA-DE-GESTI-N-DE-INCIDENTES-PARA-DBA.git"
+  },
   "build": {
     "appId": "com.dbatools.incidentmanager",
     "productName": "DBA Incident Manager",
