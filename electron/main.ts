@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, Notification } from 'electron';
+import { app, BrowserWindow, ipcMain, Notification, Tray, Menu, dialog } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import path from 'path';
 import fs from 'fs';
@@ -26,6 +26,8 @@ if (require('electron-squirrel-startup')) {
 }
 
 let mainWindow: BrowserWindow | null = null;
+let tray: Tray | null = null;
+let isQuitting = false;
 
 // Handle notifications
 ipcMain.handle('show-notification', async (_event, { title, body, urgency }) => {
@@ -78,6 +80,33 @@ const createWindow = () => {
   // Remove menu bar completely
   mainWindow.setMenuBarVisibility(false);
 
+  // Handle window close event
+  mainWindow.on('close', async (event) => {
+    if (!isQuitting) {
+      event.preventDefault();
+      
+      const choice = await dialog.showMessageBox(mainWindow!, {
+        type: 'question',
+        buttons: ['Minimizar a bandeja', 'Cerrar aplicación', 'Cancelar'],
+        title: 'Cerrar DBA Incident Manager',
+        message: '¿Qué deseas hacer?',
+        detail: 'Puedes minimizar la aplicación a la bandeja del sistema o cerrarla completamente.',
+        defaultId: 0,
+        cancelId: 2
+      });
+
+      if (choice.response === 0) {
+        // Minimizar a bandeja
+        mainWindow?.hide();
+      } else if (choice.response === 1) {
+        // Cerrar aplicación
+        isQuitting = true;
+        app.quit();
+      }
+      // Si es 2 (Cancelar), no hacer nada
+    }
+  });
+
   // and load the index.html of the app.
   // In development, we wait for the vite server to be ready
   // The package.json script handles the wait-on, but we should ensure we try to load the URL
@@ -88,6 +117,47 @@ const createWindow = () => {
     mainWindow.loadFile(path.join(__dirname, '../dist/index.html'));
     mainWindow.webContents.openDevTools(); // Habilitar DevTools en producción para debugging
   }
+};
+
+// Create system tray
+const createTray = () => {
+  const iconPath = path.join(__dirname, '../icon/base-de-datos.ico');
+  tray = new Tray(iconPath);
+  
+  const contextMenu = Menu.buildFromTemplate([
+    {
+      label: 'Mostrar DBA Incident Manager',
+      click: () => {
+        mainWindow?.show();
+      }
+    },
+    {
+      label: 'Ocultar',
+      click: () => {
+        mainWindow?.hide();
+      }
+    },
+    { type: 'separator' },
+    {
+      label: 'Salir',
+      click: () => {
+        isQuitting = true;
+        app.quit();
+      }
+    }
+  ]);
+  
+  tray.setToolTip('DBA Incident Manager');
+  tray.setContextMenu(contextMenu);
+  
+  // Doble clic en el icono para mostrar/ocultar
+  tray.on('double-click', () => {
+    if (mainWindow?.isVisible()) {
+      mainWindow.hide();
+    } else {
+      mainWindow?.show();
+    }
+  });
 };
 
 // Start backend server
@@ -172,6 +242,7 @@ app.whenReady().then(() => {
   // Wait longer for server to fully start
   setTimeout(() => {
     createWindow();
+    createTray();
   }, 5000);
 
   // Check for updates (only in production)
@@ -200,13 +271,18 @@ app.whenReady().then(() => {
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
-  stopServer();
-  if (process.platform !== 'darwin') {
-    app.quit();
+  // No hacer nada, permitir que la app siga corriendo en la bandeja
+  // Solo detener el servidor si realmente se está saliendo
+  if (isQuitting) {
+    stopServer();
+    if (process.platform !== 'darwin') {
+      app.quit();
+    }
   }
 });
 
 app.on('before-quit', () => {
+  isQuitting = true;
   stopServer();
   // Clear update check interval
   if (updateCheckInterval) {
