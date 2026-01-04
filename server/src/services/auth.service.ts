@@ -2,10 +2,13 @@ import * as jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import User from '../models/User';
 import { AppError } from '../middlewares/error.middleware';
+import path from 'path';
+import fs from 'fs';
 
 export class AuthService {
   private readonly jwtSecret = process.env.JWT_SECRET || 'secret';
   private readonly jwtExpiration = process.env.JWT_EXPIRATION || '24h';
+  private readonly defaultAvatarFilename = 'default-avatar.png';
 
   public async register(userData: any) {
     const existingUser = await User.findOne({ where: { email: userData.email } });
@@ -15,9 +18,13 @@ export class AuthService {
 
     const hashedPassword = await bcrypt.hash(userData.password, 10);
     
+    // Copiar imagen de avatar por defecto
+    const defaultAvatarPath = await this.copyDefaultAvatar();
+    
     const user = await User.create({
       ...userData,
-      password: hashedPassword
+      password: hashedPassword,
+      profile_picture: defaultAvatarPath
     });
 
     const token = this.generateToken(user);
@@ -27,6 +34,37 @@ export class AuthService {
     const { password, ...userWithoutPassword } = userResponse;
 
     return { user: userWithoutPassword, token };
+  }
+
+  private async copyDefaultAvatar(): Promise<string> {
+    try {
+      // Ruta de la imagen por defecto en public
+      const sourcePath = path.join(__dirname, '../../public/user-login-linux-kernel-answer-user-profile-chen-account-login-github-thumbnail-avatar.png');
+      
+      // Directorio de destino
+      const uploadDir = process.env.UPLOAD_DIR 
+        ? path.join(process.env.UPLOAD_DIR, 'avatars')
+        : path.join(__dirname, '../../uploads/avatars');
+      
+      // Crear directorio si no existe
+      if (!fs.existsSync(uploadDir)) {
+        fs.mkdirSync(uploadDir, { recursive: true });
+      }
+      
+      // Ruta de destino
+      const destPath = path.join(uploadDir, this.defaultAvatarFilename);
+      
+      // Copiar solo si no existe ya
+      if (!fs.existsSync(destPath)) {
+        fs.copyFileSync(sourcePath, destPath);
+      }
+      
+      return this.defaultAvatarFilename;
+    } catch (error) {
+      console.error('Error copying default avatar:', error);
+      // Si falla, retornar solo el nombre sin copiar
+      return this.defaultAvatarFilename;
+    }
   }
 
   public async login(credentials: any) {
