@@ -25,7 +25,7 @@ export class NotificationService {
             { snooze_until: { [Op.lte]: now } }
           ]
         } as any,
-        include: [{ model: User, attributes: ['id', 'full_name', 'email', 'phone_number'] }]
+        include: [{ model: User, attributes: ['id', 'full_name', 'email'] }]
       });
 
       for (const reminder of reminders) {
@@ -114,14 +114,14 @@ export class NotificationService {
 
         notifications.push(notification);
 
-        // Send email and SMS
+        // Send email
         const user = await User.findByPk(uid);
         if (user?.email) {
-          console.log(`[createIncidentNotification] Sending to user ${uid}: ${user.email} (phone: ${user.phone_number || 'none'})`);
+          console.log(`[createIncidentNotification] Sending to user ${uid}: ${user.email}`);
           try {
-            const result = await emailService.sendIncidentNotification(user.email, user.phone_number, incidentData);
+            const result = await emailService.sendIncidentNotification(user.email, incidentData);
             console.log(`[createIncidentNotification] Result for user ${uid}:`, JSON.stringify(result));
-            logger.info(`Incident notification sent to ${user.email} - Email: ${result.email}, SMS: ${result.sms}`);
+            logger.info(`Incident notification sent to ${user.email} - Email: ${result.email}`);
           } catch (emailError: any) {
             console.error(`[createIncidentNotification] ERROR sending to user ${uid}:`, emailError);
             console.error(emailError.stack);
@@ -167,17 +167,17 @@ export class NotificationService {
 
         notifications.push(notification);
 
-        // Send email and SMS
+        // Send email
         const user = await User.findByPk(userId);
         if (user?.email) {
-          console.log(`[createMonitoringAlert] Sending to user ${userId}: ${user.email} (phone: ${user.phone_number || 'none'})`);
+          console.log(`[createMonitoringAlert] Sending to user ${userId}: ${user.email}`);
           try {
-            const result = await emailService.sendMonitoringAlert(user.email, user.phone_number, {
+            const result = await emailService.sendMonitoringAlert(user.email, {
               ...alertData,
               timestamp: new Date(),
             });
             console.log(`[createMonitoringAlert] Result for user ${userId}:`, JSON.stringify(result));
-            logger.info(`Alert sent to ${user.email} - Email: ${result.email}, SMS: ${result.sms}`);
+            logger.info(`Alert sent to ${user.email} - Email: ${result.email}`);
           } catch (emailError: any) {
             console.error(`[createMonitoringAlert] ERROR sending to user ${userId}:`, emailError);
             console.error(emailError.stack);

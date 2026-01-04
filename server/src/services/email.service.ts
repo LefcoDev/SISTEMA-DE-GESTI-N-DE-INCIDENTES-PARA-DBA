@@ -1,6 +1,5 @@
 import nodemailer from 'nodemailer';
 import logger from '../utils/logger';
-import twilio from 'twilio';
 
 interface EmailOptions {
   to: string | string[];
@@ -12,10 +11,7 @@ interface EmailOptions {
 
 export class EmailService {
   private transporter: nodemailer.Transporter | null = null;
-  private twilioClient: any = null;
   private enabled: boolean = false;
-  private smsEnabled: boolean = false;
-  private smsProvider: 'email-gateway' | 'twilio' = 'email-gateway';
   private initializing: boolean = false;
   private initialized: boolean = false;
 
@@ -58,30 +54,6 @@ export class EmailService {
         logger.warn(`SMTP_USER: ${emailConfig.auth.user ? 'SET' : 'NOT SET'}`);
         logger.warn(`SMTP_PASSWORD: ${emailConfig.auth.pass ? 'SET' : 'NOT SET'}`);
       }
-
-      // Initialize SMS service (Twilio or email-gateway)
-      this.smsEnabled = process.env.SMS_ENABLED !== 'false';
-      this.smsProvider = (process.env.SMS_PROVIDER as any) || 'email-gateway';
-
-      if (this.smsEnabled && this.smsProvider === 'twilio') {
-        const twilioSid = process.env.TWILIO_ACCOUNT_SID;
-        const twilioToken = process.env.TWILIO_AUTH_TOKEN;
-        const twilioPhone = process.env.TWILIO_PHONE_NUMBER;
-
-        if (twilioSid && twilioToken && twilioPhone) {
-          this.twilioClient = twilio(twilioSid, twilioToken);
-          logger.info('Twilio SMS service initialized successfully');
-          logger.info(`Twilio configured with number: ${twilioPhone}`);
-        } else {
-          logger.warn('Twilio credentials incomplete, SMS disabled');
-          logger.warn(`TWILIO_ACCOUNT_SID: ${twilioSid ? 'SET' : 'NOT SET'}`);
-          logger.warn(`TWILIO_AUTH_TOKEN: ${twilioToken ? 'SET' : 'NOT SET'}`);
-          logger.warn(`TWILIO_PHONE_NUMBER: ${twilioPhone ? 'SET' : 'NOT SET'}`);
-          this.smsEnabled = false;
-        }
-      } else if (this.smsEnabled && this.smsProvider === 'email-gateway') {
-        logger.info('SMS via email-gateway enabled (Movistar Chile)');
-      }
     } catch (error) {
       logger.error('Failed to initialize email service:', error);
       this.enabled = false;
@@ -113,128 +85,9 @@ export class EmailService {
     }
   }
 
-  // Send SMS using Twilio or email-to-SMS gateway
-  async sendSMS(phoneNumber: string, message: string): Promise<boolean> {
-    // Check if SMS is disabled
-    if (!this.smsEnabled) {
-      logger.info('SMS disabled, skipping');
-      return false;
-    }
-
-    // Clean phone number
-    const cleanNumber = phoneNumber.replace(/[^0-9+]/g, '');
-    
-    console.log(`[SMS] Provider: ${this.smsProvider}`);
-    console.log(`[SMS] Original: ${phoneNumber} -> Clean: ${cleanNumber}`);
-    console.log(`[SMS] Message (${message.length} chars): ${message.substring(0, 160)}`);
-
-    try {
-      if (this.smsProvider === 'twilio') {
-        return await this.sendViaTwilio(cleanNumber, message);
-      } else {
-        return await this.sendViaEmailGateway(cleanNumber, message);
-      }
-    } catch (error) {
-      logger.error(`Error sending SMS to ${phoneNumber}:`, error);
-      console.error(`[SMS] Failed to send:`, error);
-      return false;
-    }
-  }
-
-  // Send SMS via Twilio API
-  private async sendViaTwilio(phoneNumber: string, message: string): Promise<boolean> {
-    if (!this.twilioClient) {
-      logger.error('Twilio client not initialized');
-      return false;
-    }
-
-    try {
-      // Ensure phone number has country code
-      const formattedNumber = phoneNumber.startsWith('+') ? phoneNumber : `+56${phoneNumber}`;
-      
-      const twilioMessage = await this.twilioClient.messages.create({
-        body: message.substring(0, 160),
-        from: process.env.TWILIO_PHONE_NUMBER,
-        to: formattedNumber
-      });
-
-      logger.info(`SMS sent via Twilio to ${phoneNumber}: ${twilioMessage.sid}`);
-      console.log(`[SMS] Twilio message sent - SID: ${twilioMessage.sid}, Status: ${twilioMessage.status}`);
-      return true;
-    } catch (error: any) {
-      logger.error(`Twilio SMS error:`, error);
-      console.error(`[SMS] Twilio error: ${error.message}`);
-      return false;
-    }
-  }
-
-  // Send SMS via Movistar Chile email-to-SMS gateway
-  private async sendViaEmailGateway(phoneNumber: string, message: string): Promise<boolean> {
-    if (!this.enabled || !this.transporter) {
-      logger.warn('Email service not enabled, skipping SMS gateway');
-      return false;
-    }
-
-    // Remove + and country code if present (gateway expects only local number)
-    const localNumber = phoneNumber.replace(/^\+?56/, ''); // Remove +56 or 56 prefix
-    
-    // Movistar Chile format: numero@movistar.cl
-    const smsGateway = `${localNumber}@movistar.cl`;
-
-    console.log(`[SMS] Gateway: ${smsGateway}`);
-
-    try {
-      const mailOptions = {
-        from: process.env.SMTP_USER,
-        to: smsGateway,
-        subject: '', // SMS gateways typically ignore subject
-        text: message.substring(0, 160), // Limit to 160 characters for SMS
-      };
-
-      const info = await this.transporter.sendMail(mailOptions);
-      logger.info(`SMS sent via email gateway to ${phoneNumber}: ${info.messageId}`);
-      console.log(`[SMS] Email gateway accepted message for ${smsGateway}`);
-      console.log(`[SMS] Note: Email-to-SMS delivery not guaranteed by carrier`);
-      return true;
-    } catch (error) {
-      logger.error(`Email gateway SMS error:`, error);
-      console.error(`[SMS] Gateway error:`, error);
-      return false;
-    }
-  }
-
-  // Send both email and SMS
-  async sendEmailAndSMS(
-    email: string,
-    phoneNumber: string | null | undefined,
-    subject: string,
-    html: string,
-    smsMessage: string
-  ): Promise<{ email: boolean; sms: boolean }> {
-    const results = {
-      email: false,
-      sms: false,
-    };
-
-    // Send email
-    results.email = await this.sendEmail({
-      to: email,
-      subject,
-      html,
-    });
-
-    // Send SMS if phone number is provided
-    if (phoneNumber) {
-      results.sms = await this.sendSMS(phoneNumber, smsMessage);
-    }
-
-    return results;
-  }
-
   // Template for incident notification
   async sendIncidentNotification(
     to: string | string[],
-    phoneNumber: string | null | undefined,
     incidentData: {
       id: number;
       title: string;
@@ -384,27 +237,18 @@ export class EmailService {
       </html>
     `;
 
-    const smsMessage = `🚨 Incidente #${incidentData.id}: ${incidentData.title}. Severidad: ${incidentData.severity}`;
-    
-    if (phoneNumber) {
-      const emailTo = Array.isArray(to) ? to[0] : to;
-      const results = await this.sendEmailAndSMS(emailTo, phoneNumber, `🚨 Incidente #${incidentData.id}: ${incidentData.title}`, html, smsMessage);
-      return { email: results.email, sms: results.sms };
-    }
-    
     const emailSent = await this.sendEmail({
       to,
       subject: `🚨 Incidente #${incidentData.id}: ${incidentData.title}`,
       html,
       priority: incidentData.severity === 'critical' ? 'high' : 'normal',
     });
-    return { email: emailSent, sms: false };
+    return { email: emailSent };
   }
 
   // Template for server/database monitoring alert
   async sendMonitoringAlert(
     to: string | string[],
-    phoneNumber: string | null | undefined,
     alertData: {
       serverName: string;
       serverType: string;
@@ -572,21 +416,13 @@ export class EmailService {
       </html>
     `;
 
-    const smsMessage = `⚠️ ${alertData.serverName}: ${alertData.status}. ${alertData.message}`;
-    
-    if (phoneNumber) {
-      const emailTo = Array.isArray(to) ? to[0] : to;
-      const results = await this.sendEmailAndSMS(emailTo, phoneNumber, `⚠️ Alerta: ${alertData.serverName} - ${alertData.status}`, html, smsMessage);
-      return { email: results.email, sms: results.sms };
-    }
-    
     const emailSent = await this.sendEmail({
       to,
       subject: `⚠️ Alerta: ${alertData.serverName} - ${alertData.status}`,
       html,
       priority: 'high',
     });
-    return { email: emailSent, sms: false };
+    return { email: emailSent };
   }
 
   // Template for reminder notification

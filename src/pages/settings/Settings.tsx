@@ -115,7 +115,6 @@ export default function Settings() {
   const [profileData, setProfileData] = useState({
     full_name: '',
     email: '',
-    phone_number: '',
     role: ''
   });
   const [passwordData, setPasswordData] = useState({
@@ -133,7 +132,6 @@ export default function Settings() {
       setProfileData({
         full_name: user.full_name || '',
         email: user.email || '',
-        phone_number: (user as any).phone_number || '',
         role: user.role || ''
       });
       // @ts-ignore
@@ -159,7 +157,6 @@ export default function Settings() {
       const formData = new FormData();
       formData.append('full_name', profileData.full_name);
       formData.append('email', profileData.email);
-      formData.append('phone_number', profileData.phone_number);
       // Role is not updated here for security, only admin can change roles via User Management
       if (avatar) {
         formData.append('avatar', avatar);
@@ -248,7 +245,6 @@ export default function Settings() {
     full_name: '',
     email: '',
     password: '',
-    phone_number: '',
     role: 'junior_dba'
   });
 
@@ -277,7 +273,6 @@ export default function Settings() {
         full_name: user.full_name,
         email: user.email,
         password: '', // Empty for updates unless changing
-        phone_number: user.phone_number || '',
         role: user.role
       });
     } else {
@@ -286,7 +281,6 @@ export default function Settings() {
         full_name: '',
         email: '',
         password: '',
-        phone_number: '',
         role: 'junior_dba'
       });
     }
@@ -301,7 +295,6 @@ export default function Settings() {
         const updateData: any = {
           full_name: userFormData.full_name,
           email: userFormData.email,
-          phone_number: userFormData.phone_number,
           role: userFormData.role
         };
         if (userFormData.password) {
@@ -624,23 +617,6 @@ export default function Settings() {
                         />
                       ) : (
                         <div className="mt-1 text-sm text-gray-900 dark:text-white">{user?.email}</div>
-                      )}
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Teléfono (Movistar Chile)</label>
-                      {isEditing ? (
-                        <div>
-                          <input
-                            type="tel"
-                            value={profileData.phone_number}
-                            onChange={(e) => setProfileData({ ...profileData, phone_number: e.target.value })}
-                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white p-2 border"
-                            placeholder="Ej: +56912345678"
-                          />
-                          <p className="mt-1 text-xs text-gray-500">Opcional. Para recibir SMS de alertas críticas.</p>
-                        </div>
-                      ) : (
-                        <div className="mt-1 text-sm text-gray-900 dark:text-white">{(user as any)?.phone_number || 'No configurado'}</div>
                       )}
                     </div>
                     <div>
@@ -1120,17 +1096,6 @@ export default function Settings() {
                     value={userFormData.email}
                     onChange={(e) => setUserFormData({ ...userFormData, email: e.target.value })}
                   />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Teléfono (Chile - Movistar)</label>
-                  <input
-                    type="tel"
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
-                    value={userFormData.phone_number}
-                    onChange={(e) => setUserFormData({ ...userFormData, phone_number: e.target.value })}
-                    placeholder="Ej: +56912345678 o 912345678"
-                  />
-                  <p className="mt-1 text-xs text-gray-500">Opcional. Para recibir SMS de alertas críticas vía Movistar Chile.</p>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
