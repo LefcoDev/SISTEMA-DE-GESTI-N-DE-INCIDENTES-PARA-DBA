@@ -1,7 +1,7 @@
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 
-const VALID_INVOKES = ['download-update', 'install-update', 'check-for-updates', 'ping', 'show-notification'];
-const VALID_ON = ['update-available', 'download-progress', 'update-downloaded', 'update-error', 'update-status'];
+const VALID_INVOKES = ['download-update', 'install-update', 'check-for-updates', 'ping', 'show-notification', 'close-app-response'];
+const VALID_ON = ['update-available', 'download-progress', 'update-downloaded', 'update-error', 'update-status', 'request-close-confirmation'];
 
 contextBridge.exposeInMainWorld('electron', {
   ping: () => ipcRenderer.invoke('ping'),

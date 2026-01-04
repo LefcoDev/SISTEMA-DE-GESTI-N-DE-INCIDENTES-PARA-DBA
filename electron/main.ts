@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, Notification, Tray, Menu, dialog } from 'electron';
+import { app, BrowserWindow, ipcMain, Notification, Tray, Menu } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import path from 'path';
 import fs from 'fs';
@@ -61,6 +61,18 @@ ipcMain.handle('show-notification', async (_event, { title, body, urgency }) => 
   }
 });
 
+// Handle close app response from renderer
+ipcMain.handle('close-app-response', async (_event, action: 'minimize' | 'close' | 'cancel') => {
+  if (action === 'minimize') {
+    mainWindow?.hide();
+  } else if (action === 'close') {
+    isQuitting = true;
+    app.quit();
+  }
+  // Si es 'cancel', no hacer nada
+  return { success: true };
+});
+
 const createWindow = () => {
   // Create the browser window.
   mainWindow = new BrowserWindow({
@@ -81,29 +93,11 @@ const createWindow = () => {
   mainWindow.setMenuBarVisibility(false);
 
   // Handle window close event
-  mainWindow.on('close', async (event) => {
+  mainWindow.on('close', (event) => {
     if (!isQuitting) {
       event.preventDefault();
-      
-      const choice = await dialog.showMessageBox(mainWindow!, {
-        type: 'question',
-        buttons: ['Minimizar a bandeja', 'Cerrar aplicación', 'Cancelar'],
-        title: 'Cerrar DBA Incident Manager',
-        message: '¿Qué deseas hacer?',
-        detail: 'Puedes minimizar la aplicación a la bandeja del sistema o cerrarla completamente.',
-        defaultId: 0,
-        cancelId: 2
-      });
-
-      if (choice.response === 0) {
-        // Minimizar a bandeja
-        mainWindow?.hide();
-      } else if (choice.response === 1) {
-        // Cerrar aplicación
-        isQuitting = true;
-        app.quit();
-      }
-      // Si es 2 (Cancelar), no hacer nada
+      // Enviar solicitud de confirmación al renderer
+      mainWindow?.webContents.send('request-close-confirmation');
     }
   });
 
