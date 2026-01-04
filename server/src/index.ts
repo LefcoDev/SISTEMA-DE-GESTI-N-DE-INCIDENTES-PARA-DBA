@@ -19,11 +19,15 @@ import logger from './utils/logger';
 import sequelize from './config/database';
 import { MonitoringService } from './services/monitoring.service';
 import notificationService from './services/notification.service';
+import { initDefaultAvatar } from './scripts/init-default-avatar';
 
 const PORT = process.env.PORT || 3001;
 
 const startServer = async () => {
   try {
+    // Initialize default avatar
+    initDefaultAvatar();
+    
     // Sync database - use authenticate only, don't alter schema
     await sequelize.authenticate();
     logger.info('Database connection established successfully');

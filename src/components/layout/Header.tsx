@@ -27,12 +27,21 @@ export default function Header({ setSidebarOpen }: HeaderProps) {
     }
   };
 
-  const getProfileImageUrl = (path: string | undefined) => {
-    if (!path) return '';
-    if (path.startsWith('http')) return path;
-    // Clean up path if it's a local file path
-    const cleanPath = path.replace(/\\/g, '/').split('uploads/').pop();
-    return `http://localhost:3001/uploads/${cleanPath}`;
+  const getProfileImageUrl = (filename: string | undefined) => {
+    if (!filename) return '';
+    if (filename.startsWith('http')) return filename;
+    
+    // Si es solo el nombre del archivo (nuevo formato)
+    // Construir URL completa: /uploads/avatars/filename
+    const baseUrl = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:3001';
+    
+    // Si ya contiene 'uploads', usar tal cual
+    if (filename.includes('uploads')) {
+      return `${baseUrl}/${filename.replace(/\\/g, '/')}`;
+    }
+    
+    // Si es solo el nombre del archivo, agregar la ruta completa
+    return `${baseUrl}/uploads/avatars/${filename}`;
   };
 
   return (

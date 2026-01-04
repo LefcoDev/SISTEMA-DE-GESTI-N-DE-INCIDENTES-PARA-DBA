@@ -94,7 +94,9 @@ export class AuthController {
 
       const updateData = { ...req.body };
       if (req.file) {
-        updateData.profile_picture = `uploads/avatars/${req.file.filename}`;
+        // Solo guardamos el nombre del archivo, no la ruta completa
+        // El servidor lo servirá desde UPLOAD_DIR/avatars/
+        updateData.profile_picture = req.file.filename;
       }
 
       const user = await authService.updateProfile(req.user.id, updateData);
