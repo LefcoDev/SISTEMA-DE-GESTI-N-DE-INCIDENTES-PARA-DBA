@@ -5,6 +5,7 @@ import { ModalProvider } from './context/ModalContext';
 import { MenuProvider } from './context/MenuContext';
 import { NotificationProvider } from './context/NotificationContext';
 import GlobalModal from './components/ui/GlobalModal';
+import CloseAppModal from './components/CloseAppModal';
 import UpdateNotification from './components/UpdateNotification';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import MainLayout from './components/layout/MainLayout';
@@ -34,6 +35,7 @@ function App() {
           <MenuProvider>
             <NotificationProvider>
               <GlobalModal />
+              <CloseAppModal />
               <UpdateNotification />
               <Routes>
             <Route path="/login" element={<Login />} />

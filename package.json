@@ -75,7 +75,8 @@
         }
       ],
       "sign": null,
-      "artifactName": "DBA.Incident.Manager-Setup-${version}.${ext}"
+      "artifactName": "DBA.Incident.Manager-Setup-${version}.${ext}",
+      "requestedExecutionLevel": "asInvoker"
     },
     "nsis": {
       "oneClick": false,
