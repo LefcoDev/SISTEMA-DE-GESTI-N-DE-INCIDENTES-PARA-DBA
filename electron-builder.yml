@@ -23,7 +23,7 @@ win:
       arch:
         - x64
   icon: public/icon.ico
-  artifactName: ${productName}-Setup-${version}.${ext}
+  artifactName: DBA-Incident-Manager-Setup-${version}.${ext}
 
 nsis:
   oneClick: true
