@@ -26,10 +26,16 @@ win:
   artifactName: ${productName}-Setup-${version}.${ext}
 
 nsis:
-  oneClick: false
-  allowToChangeInstallationDirectory: true
+  oneClick: true
+  perMachine: false
+  allowElevation: true
+  allowToChangeInstallationDirectory: false
   createDesktopShortcut: true
   createStartMenuShortcut: true
+  runAfterFinish: true
+  # Silent updates - no installer UI shown
+  installerSidebar: build/installerSidebar.bmp
+  uninstallerSidebar: build/uninstallerSidebar.bmp
 
 mac:
   target:

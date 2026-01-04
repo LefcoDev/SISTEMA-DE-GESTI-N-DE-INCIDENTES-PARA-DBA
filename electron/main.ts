@@ -7,21 +7,18 @@ import log from 'electron-log';
 // Configure logging
 log.transports.file.level = 'info';
 autoUpdater.logger = log;
-autoUpdater.autoDownload = false;
-autoUpdater.autoInstallOnAppQuit = true;
 
-// Force update check on startup
-app.on('ready', () => {
-  // Check for updates immediately (after a short delay to ensure net is ready)
-  setTimeout(() => {
-    checkForUpdates();
-  }, 10000); 
+// Configure auto-updater for silent background updates
+autoUpdater.autoDownload = false; // Manual download after user confirmation
+autoUpdater.autoInstallOnAppQuit = false; // Don't auto-install on quit
+autoUpdater.allowPrerelease = false;
+autoUpdater.fullChangelog = true;
 
-  // Then check every 1 hour (changed from 10 mins to avoid spamming GitHub API rate limits in dev)
-  setInterval(() => {
-    checkForUpdates();
-  }, 60 * 60 * 1000);
-});
+// Force update check settings
+const UPDATE_CHECK_INTERVAL = 60 * 60 * 1000; // 1 hour
+
+// Update check interval reference
+let updateCheckInterval: NodeJS.Timeout | null = null;
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
@@ -179,7 +176,15 @@ app.whenReady().then(() => {
 
   // Check for updates (only in production)
   if (app.isPackaged) {
-    checkForUpdates();
+    // Check after 30 seconds to ensure everything is loaded
+    setTimeout(() => {
+      checkForUpdates();
+    }, 30000);
+    
+    // Then check every hour
+    updateCheckInterval = setInterval(() => {
+      checkForUpdates();
+    }, UPDATE_CHECK_INTERVAL);
   }
 
   app.on('activate', () => {
@@ -203,6 +208,11 @@ app.on('window-all-closed', () => {
 
 app.on('before-quit', () => {
   stopServer();
+  // Clear update check interval
+  if (updateCheckInterval) {
+    clearInterval(updateCheckInterval);
+    updateCheckInterval = null;
+  }
 });
 
 // IPC Handlers will be added here
@@ -229,7 +239,11 @@ autoUpdater.on('checking-for-update', () => {
 autoUpdater.on('update-available', (info) => {
   log.info('Update available:', info);
   if (mainWindow) {
-    mainWindow.webContents.send('update-available', info);
+    mainWindow.webContents.send('update-available', {
+      version: info.version,
+      releaseNotes: info.releaseNotes,
+      releaseDate: info.releaseDate,
+    });
     mainWindow.webContents.send('update-status', 'available');
   }
 });
@@ -276,7 +290,19 @@ ipcMain.handle('download-update', async () => {
 });
 
 ipcMain.handle('install-update', () => {
-  autoUpdater.quitAndInstall(false, true);
+  try {
+    log.info('Installing update and restarting app...');
+    // Force immediate restart and update
+    // isSilent = true (no confirmation dialogs)
+    // isForceRunAfter = true (restart after install)
+    setImmediate(() => {
+      autoUpdater.quitAndInstall(true, true);
+    });
+    return { success: true };
+  } catch (error) {
+    log.error('Error installing update:', error);
+    return { success: false, error: String(error) };
+  }
 });
 
 ipcMain.handle('check-for-updates', async () => {

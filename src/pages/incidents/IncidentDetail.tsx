@@ -12,6 +12,7 @@ import {
   PlusIcon
 } from '@heroicons/react/24/outline';
 import { useModal } from '../../context/ModalContext';
+import { SimilarIncidents } from '../../features/incidents/components';
 
 interface IncidentDetail {
   id: number;
@@ -346,6 +347,22 @@ export default function IncidentDetail() {
           </dl>
         </div>
       </div>
+
+      {/* Similar Incidents Section */}
+      {incident && (
+        <div className="mt-6">
+          <SimilarIncidents 
+            incidentId={incident.id}
+            onApplySolution={(solution) => {
+              showModal({
+                type: 'info',
+                title: 'Solución Copiada',
+                message: 'La solución ha sido copiada. Puedes adaptarla a tu caso específico.'
+              });
+            }}
+          />
+        </div>
+      )}
     </div>
   );
 }

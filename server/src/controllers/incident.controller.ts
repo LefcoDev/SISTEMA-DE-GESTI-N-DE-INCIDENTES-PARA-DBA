@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { IncidentService } from '../services/incident.service';
 import { AuditService } from '../services/audit.service';
+import similarityService from '../services/similarity.service';
 
 const incidentService = new IncidentService();
 const auditService = new AuditService();
@@ -116,13 +117,15 @@ export const deleteIncident = async (req: Request, res: Response, next: NextFunc
 
 export const getSimilarIncidents = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { title, type, server_id } = req.query;
-    const incidents = await incidentService.findSimilar({
-      title: title as string,
-      type: type as string,
-      server_id: server_id ? Number(server_id) : undefined
-    });
-    res.json(incidents);
+    const incidentId = Number(req.params.id);
+    const limit = req.query.limit ? Number(req.query.limit) : 5;
+
+    if (!incidentId || isNaN(incidentId)) {
+      return res.status(400).json({ message: 'Valid incident ID is required' });
+    }
+
+    const similarIncidents = await similarityService.findSimilarIncidents(incidentId, limit);
+    res.json(similarIncidents);
   } catch (error) {
     next(error);
   }

@@ -18,7 +18,7 @@ const router = Router();
 router.use(authenticate);
 
 router.get('/', getIncidents);
-router.get('/similar', getSimilarIncidents);
+router.get('/:id/similar', getSimilarIncidents);
 router.get('/:id', getIncident);
 router.post('/', createIncidentValidator, validate, createIncident);
 router.put('/:id', updateIncidentValidator, validate, updateIncident);
