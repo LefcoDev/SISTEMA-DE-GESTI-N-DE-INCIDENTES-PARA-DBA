@@ -1,6 +1,6 @@
 {
   "name": "dba-incident-manager",
-  "version": "1.0.16",
+  "version": "1.0.17",
   "description": "Aplicación de escritorio para administradores de bases de datos",
   "main": "dist-electron/main.js",
   "scripts": {
@@ -75,7 +75,7 @@
         }
       ],
       "sign": null,
-      "artifactName": "${productName}-Setup-${version}.${ext}"
+      "artifactName": "DBA.Incident.Manager-Setup-${version}.${ext}"
     },
     "nsis": {
       "oneClick": false,
