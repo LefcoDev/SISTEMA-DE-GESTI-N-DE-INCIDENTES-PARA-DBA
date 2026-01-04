@@ -3,7 +3,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { useModal } from '../../context/ModalContext';
 import { useMenu, MenuItem } from '../../context/MenuContext';
-import { UserCircleIcon, ShieldCheckIcon, ComputerDesktopIcon, TagIcon, ArchiveBoxIcon, TrashIcon, ArrowPathIcon, CameraIcon, CheckCircleIcon, XCircleIcon, UsersIcon, PlusIcon, PencilSquareIcon, Bars3Icon, ChevronUpIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
+import { UserCircleIcon, ShieldCheckIcon, ComputerDesktopIcon, TagIcon, ArchiveBoxIcon, TrashIcon, ArrowPathIcon, CameraIcon, CheckCircleIcon, XCircleIcon, UsersIcon, PlusIcon, PencilSquareIcon, Bars3Icon, ChevronUpIcon, ChevronDownIcon, KeyIcon } from '@heroicons/react/24/outline';
 import PasswordInput from '../../components/PasswordInput';
 import { tagService, Tag } from '../../services/tag.service';
 import { backupService, Backup } from '../../services/backup.service';
@@ -517,6 +517,7 @@ export default function Settings() {
 
   const tabs = [
     { id: 'profile', name: 'Perfil', icon: UserCircleIcon },
+    { id: 'password', name: 'Contraseña', icon: KeyIcon },
     ...(user?.role === 'admin' ? [{ id: 'users', name: 'Usuarios', icon: UsersIcon }] : []),
     { id: 'tags', name: 'Tags', icon: TagIcon },
     { id: 'backups', name: 'Backups', icon: ArchiveBoxIcon },
@@ -663,67 +664,6 @@ export default function Settings() {
                   )}
                 </form>
 
-                {/* Change Password Section */}
-                <div className="mt-10 pt-10 border-t border-gray-200 dark:border-gray-700">
-                  <h3 className="text-lg font-medium leading-6 text-gray-900 dark:text-white mb-4">Cambiar Contraseña</h3>
-                  <form onSubmit={handleChangePassword} className="max-w-md">
-                    <div className="space-y-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Contraseña Actual</label>
-                        <div className="mt-1">
-                          <PasswordInput
-                            id="current_password"
-                            name="current_password"
-                            value={passwordData.current_password}
-                            onChange={(e) => setPasswordData({ ...passwordData, current_password: e.target.value })}
-                            required
-                            placeholder="Contraseña actual"
-                            className="dark:bg-gray-700 dark:border-gray-600 dark:text-white p-2 border"
-                          />
-                        </div>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Nueva Contraseña</label>
-                        <div className="mt-1">
-                          <PasswordInput
-                            id="new_password"
-                            name="new_password"
-                            value={passwordData.new_password}
-                            onChange={(e) => setPasswordData({ ...passwordData, new_password: e.target.value })}
-                            required
-                            placeholder="Nueva contraseña (mínimo 8 caracteres)"
-                            autoComplete="new-password"
-                            className="dark:bg-gray-700 dark:border-gray-600 dark:text-white p-2 border"
-                          />
-                        </div>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Confirmar Nueva Contraseña</label>
-                        <div className="mt-1">
-                          <PasswordInput
-                            id="confirm_password"
-                            name="confirm_password"
-                            value={passwordData.confirm_password}
-                            onChange={(e) => setPasswordData({ ...passwordData, confirm_password: e.target.value })}
-                            required
-                            placeholder="Confirmar nueva contraseña"
-                            autoComplete="new-password"
-                            className="dark:bg-gray-700 dark:border-gray-600 dark:text-white p-2 border"
-                          />
-                        </div>
-                      </div>
-                      <div>
-                        <button
-                          type="submit"
-                          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                        >
-                          Actualizar Contraseña
-                        </button>
-                      </div>
-                    </div>
-                  </form>
-                </div>
-
                 <div className="mt-8 border-t border-gray-200 dark:border-gray-700 pt-6">
                   <button
                     onClick={logout}
@@ -732,6 +672,81 @@ export default function Settings() {
                     Cerrar Sesión
                   </button>
                 </div>
+              </div>
+            </div>
+          )}
+
+          {/* Password Tab */}
+          {activeTab === 'password' && (
+            <div className="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
+              <div className="px-4 py-5 sm:px-6 border-b border-gray-200 dark:border-gray-700">
+                <h3 className="text-lg font-medium leading-6 text-gray-900 dark:text-white">Cambiar Contraseña</h3>
+                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Actualiza tu contraseña para mantener tu cuenta segura</p>
+              </div>
+              <div className="px-4 py-5 sm:p-6">
+                <form onSubmit={handleChangePassword} className="max-w-md">
+                  <div className="space-y-6">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Contraseña Actual
+                      </label>
+                      <PasswordInput
+                        id="current_password"
+                        name="current_password"
+                        value={passwordData.current_password}
+                        onChange={(e) => setPasswordData({ ...passwordData, current_password: e.target.value })}
+                        required
+                        placeholder="Ingresa tu contraseña actual"
+                        className="dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Nueva Contraseña
+                      </label>
+                      <PasswordInput
+                        id="new_password"
+                        name="new_password"
+                        value={passwordData.new_password}
+                        onChange={(e) => setPasswordData({ ...passwordData, new_password: e.target.value })}
+                        required
+                        placeholder="Mínimo 8 caracteres"
+                        autoComplete="new-password"
+                        className="dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                      />
+                      <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                        La contraseña debe tener al menos 8 caracteres
+                      </p>
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Confirmar Nueva Contraseña
+                      </label>
+                      <PasswordInput
+                        id="confirm_password"
+                        name="confirm_password"
+                        value={passwordData.confirm_password}
+                        onChange={(e) => setPasswordData({ ...passwordData, confirm_password: e.target.value })}
+                        required
+                        placeholder="Confirma tu nueva contraseña"
+                        autoComplete="new-password"
+                        className="dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                      />
+                    </div>
+                    
+                    <div className="pt-4">
+                      <button
+                        type="submit"
+                        className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                      >
+                        <KeyIcon className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
+                        Actualizar Contraseña
+                      </button>
+                    </div>
+                  </div>
+                </form>
               </div>
             </div>
           )}
