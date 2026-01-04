@@ -140,7 +140,15 @@ export default function Settings() {
       if (user.profile_picture) {
         const baseUrl = (import.meta.env?.VITE_API_URL || 'http://localhost:3001/api').replace('/api', '');
         // @ts-ignore
-        setAvatarPreview(`${baseUrl}/${user.profile_picture}`);
+        const filename = user.profile_picture;
+        
+        // Si ya contiene 'uploads', usar tal cual
+        if (filename.includes('uploads')) {
+          setAvatarPreview(`${baseUrl}/${filename.replace(/\\/g, '/')}`);
+        } else {
+          // Si es solo el nombre del archivo, agregar la ruta completa
+          setAvatarPreview(`${baseUrl}/uploads/avatars/${filename}`);
+        }
       }
     }
   }, [user]);
