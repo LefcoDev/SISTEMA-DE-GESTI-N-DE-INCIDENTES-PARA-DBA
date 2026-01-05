@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { solutionService, Solution } from '../../services/solution.service';
 import { MagnifyingGlassIcon, EyeIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { useModal } from '../../context/ModalContext';
 
 export default function SolutionList() {
+  const { t } = useTranslation();
   const [solutions, setSolutions] = useState<Solution[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -29,13 +31,13 @@ export default function SolutionList() {
   const handleDelete = async (id: number) => {
     showModal({
       type: 'confirm',
-      title: 'Eliminar Solución',
-      message: '¿Estás seguro de eliminar esta solución? Esta acción no se puede deshacer.',
+      title: t('solutions.title'),
+      message: t('solutions.confirmDelete'),
       onConfirm: async () => {
         try {
           await solutionService.delete(id);
           setSolutions(solutions.filter(s => s.id !== id));
-          showModal({ type: 'success', title: 'Éxito', message: 'Solución eliminada correctamente' });
+          showModal({ type: 'success', title: t('common.success'), message: t('messages.deleteSuccess') });
         } catch (error) {
           console.error('Error deleting solution:', error);
           showModal({ type: 'error', title: 'Error', message: 'No se pudo eliminar la solución' });
@@ -58,16 +60,16 @@ export default function SolutionList() {
   });
 
   if (loading) {
-    return <div className="p-4">Cargando soluciones...</div>;
+    return <div className="p-4">{t('solutions.loading')}</div>;
   }
 
   return (
     <div className="px-4 sm:px-6 lg:px-8">
       <div className="sm:flex sm:items-center">
         <div className="sm:flex-auto">
-          <h1 className="text-base font-semibold leading-6 text-gray-900">Soluciones</h1>
+          <h1 className="text-base font-semibold leading-6 text-gray-900">{t('solutions.title')}</h1>
           <p className="mt-2 text-sm text-gray-700">
-            Registro de soluciones aplicadas a incidentes y base de conocimiento.
+            {t('solutions.description')}
           </p>
         </div>
         <div className="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
@@ -75,7 +77,7 @@ export default function SolutionList() {
             to="/solutions/new"
             className="block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
-            Nueva Solución
+            {t('solutions.newSolution')}
           </Link>
         </div>
       </div>
@@ -88,7 +90,7 @@ export default function SolutionList() {
           <input
             type="text"
             className="block w-full rounded-md border-0 py-1.5 pl-10 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-            placeholder="Buscar soluciones..."
+            placeholder={t('solutions.searchPlaceholder')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -102,7 +104,7 @@ export default function SolutionList() {
               filterType === 'all' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-900 hover:bg-gray-50'
             }`}
           >
-            Todos
+            {t('solutions.all')}
           </button>
           <button
             type="button"
@@ -111,7 +113,7 @@ export default function SolutionList() {
               filterType === 'solution' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-900 hover:bg-gray-50'
             }`}
           >
-            Soluciones
+            {t('solutions.solutionsFilter')}
           </button>
           <button
             type="button"
@@ -120,7 +122,7 @@ export default function SolutionList() {
               filterType === 'template' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-900 hover:bg-gray-50'
             }`}
           >
-            Plantillas
+            {t('solutions.templates')}
           </button>
         </div>
       </div>
@@ -132,19 +134,19 @@ export default function SolutionList() {
               <thead>
                 <tr>
                   <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0">
-                    Descripción
+                    {t('solutions.fields.description')}
                   </th>
                   <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                    Incidente
+                    {t('solutions.fields.incident')}
                   </th>
                   <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                    Tipo
+                    {t('solutions.fields.type')}
                   </th>
                   <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                    Aplicado por
+                    {t('solutions.fields.appliedBy')}
                   </th>
                   <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                    Fecha
+                    {t('solutions.fields.date')}
                   </th>
                   <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-0">
                     <span className="sr-only">Acciones</span>

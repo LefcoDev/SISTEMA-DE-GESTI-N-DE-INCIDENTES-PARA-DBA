@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { PlusIcon, PencilSquareIcon, TrashIcon, EyeIcon } from '@heroicons/react/24/outline';
 import api from '../../lib/axios';
 import IncidentModal from './IncidentModal';
@@ -23,6 +24,7 @@ interface Incident {
 }
 
 export default function IncidentList() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [incidents, setIncidents] = useState<Incident[]>([]);
   const [loading, setLoading] = useState(true);
@@ -36,7 +38,7 @@ export default function IncidentList() {
       setIncidents(response.data);
     } catch (error) {
       console.error('Error fetching incidents:', error);
-      showModal({ type: 'error', title: 'Error', message: 'Error al cargar los incidentes' });
+      showModal({ type: 'error', title: t('common.error'), message: t('incidents.errorLoading') });
     } finally {
       setLoading(false);
     }
@@ -89,16 +91,16 @@ export default function IncidentList() {
   };
 
   if (loading) {
-    return <div>Cargando...</div>;
+    return <div>{t('common.loading')}</div>;
   }
 
   return (
     <div className="px-4 sm:px-6 lg:px-8">
       <div className="sm:flex sm:items-center">
         <div className="sm:flex-auto">
-          <h1 className="text-base font-semibold leading-6 text-gray-900">Incidentes</h1>
+          <h1 className="text-base font-semibold leading-6 text-gray-900">{t('incidents.title')}</h1>
           <p className="mt-2 text-sm text-gray-700">
-            Lista de incidentes registrados en los servidores de base de datos.
+            {t('incidents.description')}
           </p>
         </div>
         <div className="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
@@ -108,7 +110,7 @@ export default function IncidentList() {
             className="block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             <PlusIcon className="h-5 w-5 inline-block mr-1" />
-            Nuevo Incidente
+            {t('incidents.newIncident')}
           </button>
         </div>
       </div>
@@ -120,25 +122,25 @@ export default function IncidentList() {
                 <thead className="bg-gray-50">
                   <tr>
                     <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">
-                      Título
+                      {t('incidents.fields.title')}
                     </th>
                     <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                      Servidor
+                      {t('incidents.fields.server')}
                     </th>
                     <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                      Tipo
+                      {t('common.type')}
                     </th>
                     <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                      Severidad
+                      {t('incidents.fields.severity')}
                     </th>
                     <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                      Estado
+                      {t('incidents.fields.status')}
                     </th>
                     <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                      Fecha
+                      {t('common.date')}
                     </th>
                     <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
-                      <span className="sr-only">Acciones</span>
+                      <span className="sr-only">{t('common.actions')}</span>
                     </th>
                   </tr>
                 </thead>
@@ -161,7 +163,7 @@ export default function IncidentList() {
                           incident.severity === 'medium' ? 'bg-yellow-50 text-yellow-800 ring-yellow-600/20' :
                           'bg-green-50 text-green-700 ring-green-600/20'
                         }`}>
-                          {incident.severity}
+                          {t(`incidents.severity.${incident.severity}`)}
                         </span>
                       </td>
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
@@ -171,7 +173,7 @@ export default function IncidentList() {
                           incident.status === 'resolved' ? 'bg-green-50 text-green-700 ring-green-600/20' :
                           'bg-gray-50 text-gray-600 ring-gray-500/10'
                         }`}>
-                          {incident.status}
+                          {t(`incidents.status.${incident.status}`)}
                         </span>
                       </td>
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">

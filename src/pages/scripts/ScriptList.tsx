@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { PlusIcon, PencilSquareIcon, TrashIcon, CodeBracketIcon, PlayIcon } from '@heroicons/react/24/outline';
 import { scriptService, Script } from '../../services/script.service';
 import ScriptModal from './ScriptModal';
@@ -6,6 +7,7 @@ import ScriptExecutionModal from './ScriptExecutionModal';
 import { useModal } from '../../context/ModalContext';
 
 export default function ScriptList() {
+  const { t } = useTranslation();
   const [scripts, setScripts] = useState<Script[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -20,7 +22,7 @@ export default function ScriptList() {
       setScripts(data);
     } catch (error) {
       console.error('Error fetching scripts:', error);
-      showModal({ type: 'error', title: 'Error', message: 'Error al cargar los scripts' });
+      showModal({ type: 'error', title: t('common.error'), message: t('scripts.errorLoading') });
     } finally {
       setLoading(false);
     }
@@ -79,19 +81,19 @@ export default function ScriptList() {
   };
 
   if (loading) {
-    return <div className="p-4">Cargando scripts...</div>;
+    return <div className="p-4">{t('scripts.loading')}</div>;
   }
 
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Biblioteca de Scripts</h1>
+        <h1 className="text-2xl font-bold text-gray-900">{t('scripts.libraryTitle')}</h1>
         <button
           onClick={handleCreate}
           className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
         >
           <PlusIcon className="h-5 w-5 mr-2" />
-          Nuevo Script
+          {t('scripts.newScript')}
         </button>
       </div>
 
@@ -113,7 +115,7 @@ export default function ScriptList() {
                       {script.category}
                     </span>
                     <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-600">
-                      Uso: {script.usage_count}
+                      {t('scripts.usage')}: {script.usage_count}
                     </span>
                   </div>
                 </div>

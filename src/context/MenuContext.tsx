@@ -13,6 +13,7 @@ import {
   PencilSquareIcon,
   BellIcon,
   AcademicCapIcon,
+  ChatBubbleLeftRightIcon,
 } from '@heroicons/react/24/outline';
 
 export interface MenuItem {
@@ -51,6 +52,7 @@ const iconMap: Record<string, any> = {
   PencilSquareIcon,
   BellIcon,
   AcademicCapIcon,
+  ChatBubbleLeftRightIcon,
 };
 
 const defaultMenuItems: MenuItem[] = [
@@ -64,9 +66,10 @@ const defaultMenuItems: MenuItem[] = [
   { id: 'solutions', name: 'Soluciones', href: '/solutions', iconName: 'BookOpenIcon', visible: true, order: 7 },
   { id: 'scripts', name: 'Scripts', href: '/scripts', iconName: 'CommandLineIcon', visible: true, order: 8 },
   { id: 'reports', name: 'Reportes', href: '/reports', iconName: 'DocumentTextIcon', visible: true, order: 9 },
-  { id: 'search', name: 'Búsqueda', href: '/search', iconName: 'MagnifyingGlassIcon', visible: true, order: 10 },
-  { id: 'settings', name: 'Configuración', href: '/settings', iconName: 'Cog6ToothIcon', visible: true, order: 11, required: true }, // Settings should probably also be required or at least handled carefully
-  { id: 'audit', name: 'Auditoría', href: '/audit', iconName: 'ShieldCheckIcon', visible: true, order: 12 }, // Admin only, handled in component
+  { id: 'chat', name: 'Chat', href: '/chat', iconName: 'ChatBubbleLeftRightIcon', visible: true, order: 10 },
+  { id: 'search', name: 'Búsqueda', href: '/search', iconName: 'MagnifyingGlassIcon', visible: true, order: 11 },
+  { id: 'settings', name: 'Configuración', href: '/settings', iconName: 'Cog6ToothIcon', visible: true, order: 12, required: true }, // Settings should probably also be required or at least handled carefully
+  { id: 'audit', name: 'Auditoría', href: '/audit', iconName: 'ShieldCheckIcon', visible: true, order: 13 }, // Admin only, handled in component
 ];
 
 export function MenuProvider({ children }: { children: ReactNode }) {

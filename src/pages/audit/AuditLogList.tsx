@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import api from '../../lib/axios';
 import { formatDate } from '../../lib/dateUtils';
 import { TrashIcon, MagnifyingGlassIcon, ChevronLeftIcon, ChevronRightIcon, EyeIcon, XMarkIcon } from '@heroicons/react/24/outline';
@@ -23,6 +24,7 @@ interface AuditLog {
 }
 
 export default function AuditLogList() {
+  const { t } = useTranslation();
   const [logs, setLogs] = useState<AuditLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({
@@ -60,8 +62,8 @@ export default function AuditLogList() {
   const handleDelete = async (id: number) => {
     showModal({
       type: 'confirm',
-      title: 'Eliminar Registro',
-      message: '¿Estás seguro de eliminar este registro de auditoría? Esta acción no se puede deshacer.',
+      title: t('common.delete'),
+      message: t('audit.deleteConfirm'),
       onConfirm: async () => {
         try {
           await api.delete(`/audit/${id}`);
@@ -94,9 +96,9 @@ export default function AuditLogList() {
     <div className="px-4 sm:px-6 lg:px-8">
       <div className="sm:flex sm:items-center">
         <div className="sm:flex-auto">
-          <h1 className="text-base font-semibold leading-6 text-gray-900">Auditoría</h1>
+          <h1 className="text-base font-semibold leading-6 text-gray-900">{t('audit.title')}</h1>
           <p className="mt-2 text-sm text-gray-700">
-            Registro de actividades y cambios en el sistema.
+            {t('audit.description')}
           </p>
         </div>
       </div>
@@ -110,7 +112,7 @@ export default function AuditLogList() {
             type="text"
             value={searchTerm}
             onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
-            placeholder="Buscar por usuario, entidad o acción..."
+            placeholder={t('audit.searchPlaceholder')}
             className="block w-full rounded-md border-0 py-1.5 pl-10 pr-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
           />
         </div>
@@ -120,13 +122,13 @@ export default function AuditLogList() {
           onChange={(e) => { setFilters({ ...filters, entity_type: e.target.value }); setCurrentPage(1); }}
           className="block rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
         >
-          <option value="">Todas las Entidades</option>
-          <option value="USER">Usuarios</option>
-          <option value="SERVER">Servidores</option>
-          <option value="INCIDENT">Incidentes</option>
-          <option value="SOLUTION">Soluciones</option>
-          <option value="SCRIPT">Scripts</option>
-          <option value="AUTH">Autenticación</option>
+          <option value="">{t('audit.allEntities')}</option>
+          <option value="USER">{t('audit.entities.USER')}</option>
+          <option value="SERVER">{t('audit.entities.SERVER')}</option>
+          <option value="INCIDENT">{t('audit.entities.INCIDENT')}</option>
+          <option value="SOLUTION">{t('audit.entities.SOLUTION')}</option>
+          <option value="SCRIPT">{t('audit.entities.SCRIPT')}</option>
+          <option value="AUTH">{t('audit.entities.AUTH')}</option>
         </select>
 
         <select
@@ -134,12 +136,12 @@ export default function AuditLogList() {
           onChange={(e) => { setFilters({ ...filters, action: e.target.value }); setCurrentPage(1); }}
           className="block rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
         >
-          <option value="">Todas las Acciones</option>
-          <option value="CREATE">Creación</option>
-          <option value="UPDATE">Actualización</option>
-          <option value="DELETE">Eliminación</option>
-          <option value="LOGIN">Login</option>
-          <option value="REGISTER">Registro</option>
+          <option value="">{t('audit.allActions')}</option>
+          <option value="CREATE">{t('audit.actions.CREATE')}</option>
+          <option value="UPDATE">{t('audit.actions.UPDATE')}</option>
+          <option value="DELETE">{t('audit.actions.DELETE')}</option>
+          <option value="LOGIN">{t('audit.actions.LOGIN')}</option>
+          <option value="REGISTER">{t('audit.actions.REGISTER')}</option>
         </select>
       </div>
 
@@ -150,25 +152,25 @@ export default function AuditLogList() {
               <table className="min-w-full divide-y divide-gray-300">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">Fecha</th>
-                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Usuario</th>
-                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Acción</th>
-                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Entidad</th>
-                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Cambios</th>
-                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">IP</th>
+                    <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">{t('audit.fields.date')}</th>
+                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">{t('audit.fields.user')}</th>
+                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">{t('audit.fields.action')}</th>
+                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">{t('audit.fields.entity')}</th>
+                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">{t('audit.fields.changes')}</th>
+                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">{t('audit.fields.ip')}</th>
                     <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6 text-right">
-                      Acciones
+                      {t('audit.fields.actions')}
                     </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200 bg-white">
                   {loading ? (
                     <tr>
-                      <td colSpan={7} className="text-center py-4">Cargando registros...</td>
+                      <td colSpan={7} className="text-center py-4">{t('audit.loading')}</td>
                     </tr>
                   ) : logs.length === 0 ? (
                     <tr>
-                      <td colSpan={7} className="text-center py-4">No se encontraron registros</td>
+                      <td colSpan={7} className="text-center py-4">{t('audit.noRecords')}</td>
                     </tr>
                   ) : (
                     paginatedLogs.map((log) => (
@@ -199,7 +201,7 @@ export default function AuditLogList() {
                             className="inline-flex items-center gap-1 text-indigo-600 hover:text-indigo-900"
                           >
                             <EyeIcon className="h-4 w-4" />
-                            <span className="text-xs">Ver detalles</span>
+                            <span className="text-xs">{t('audit.viewDetails')}</span>
                           </button>
                         </td>
                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
@@ -305,7 +307,7 @@ export default function AuditLogList() {
                   <div className="mt-3 w-full text-center sm:mt-0 sm:text-left">
                     <div className="flex justify-between items-center mb-4">
                       <h3 className="text-lg font-medium leading-6 text-gray-900" id="modal-title">
-                        Detalles del Registro de Auditoría
+                        {t('audit.detailsTitle')}
                       </h3>
                       <button
                         onClick={() => setSelectedLog(null)}
@@ -318,16 +320,16 @@ export default function AuditLogList() {
                     <div className="space-y-4">
                       <div className="grid grid-cols-2 gap-4 text-sm">
                         <div>
-                          <span className="font-semibold">Fecha:</span>
+                          <span className="font-semibold">{t('audit.fields.date')}:</span>
                           <p>{formatDate(new Date(selectedLog.created_at), 'datetime')}</p>
                         </div>
                         <div>
-                          <span className="font-semibold">Usuario:</span>
+                          <span className="font-semibold">{t('audit.fields.user')}:</span>
                           <p>{selectedLog.user?.full_name || 'Sistema'}</p>
                           <p className="text-xs text-gray-500">{selectedLog.user?.email}</p>
                         </div>
                         <div>
-                          <span className="font-semibold">Acción:</span>
+                          <span className="font-semibold">{t('audit.fields.action')}:</span>
                           <p>
                             <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${
                               selectedLog.action === 'DELETE' ? 'bg-red-50 text-red-700 ring-red-600/10' :
@@ -340,11 +342,11 @@ export default function AuditLogList() {
                           </p>
                         </div>
                         <div>
-                          <span className="font-semibold">Entidad:</span>
+                          <span className="font-semibold">{t('audit.fields.entity')}:</span>
                           <p>{selectedLog.entity_type} #{selectedLog.entity_id}</p>
                         </div>
                         <div>
-                          <span className="font-semibold">IP:</span>
+                          <span className="font-semibold">{t('audit.fields.ip')}:</span>
                           <p>{selectedLog.ip_address}</p>
                         </div>
                       </div>
@@ -352,13 +354,13 @@ export default function AuditLogList() {
                       {selectedLog.action === 'UPDATE' && (
                         <div className="grid grid-cols-2 gap-4 mt-6">
                           <div>
-                            <h4 className="font-semibold text-red-600 mb-2">Valor Anterior:</h4>
+                            <h4 className="font-semibold text-red-600 mb-2">{t('audit.fields.oldValue')}:</h4>
                             <pre className="text-xs bg-red-50 p-3 rounded overflow-x-auto max-h-96 border border-red-200">
                               {selectedLog.old_value ? JSON.stringify(JSON.parse(selectedLog.old_value), null, 2) : '-'}
                             </pre>
                           </div>
                           <div>
-                            <h4 className="font-semibold text-green-600 mb-2">Valor Nuevo:</h4>
+                            <h4 className="font-semibold text-green-600 mb-2">{t('audit.fields.newValue')}:</h4>
                             <pre className="text-xs bg-green-50 p-3 rounded overflow-x-auto max-h-96 border border-green-200">
                               {selectedLog.new_value ? JSON.stringify(JSON.parse(selectedLog.new_value), null, 2) : '-'}
                             </pre>
@@ -368,7 +370,7 @@ export default function AuditLogList() {
 
                       {selectedLog.action !== 'UPDATE' && (
                         <div className="mt-6">
-                          <h4 className="font-semibold mb-2">Datos:</h4>
+                          <h4 className="font-semibold mb-2">{t('audit.fields.data')}:</h4>
                           <pre className="text-xs bg-gray-50 p-3 rounded overflow-x-auto max-h-96 border border-gray-200">
                             {(selectedLog.new_value || selectedLog.old_value) 
                               ? JSON.stringify(JSON.parse(selectedLog.new_value || selectedLog.old_value || '{}'), null, 2) 
@@ -386,7 +388,7 @@ export default function AuditLogList() {
                   onClick={() => setSelectedLog(null)}
                   className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
                 >
-                  Cerrar
+                  {t('common.close')}
                 </button>
               </div>
             </div>

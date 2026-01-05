@@ -1,4 +1,4 @@
-import { Model, DataTypes, Optional, BelongsToManySetAssociationsMixin } from 'sequelize';
+import { Model, DataTypes, Optional, BelongsToManySetAssociationsMixin, BelongsToManyGetAssociationsMixin } from 'sequelize';
 import sequelize from '../config/database';
 import User from './User';
 import Tag from './Tag';
@@ -35,6 +35,7 @@ class Script extends Model<ScriptAttributes, ScriptCreationAttributes> implement
   public readonly updated_at!: Date;
 
   public setTags!: BelongsToManySetAssociationsMixin<Tag, number>;
+  public getTags!: BelongsToManyGetAssociationsMixin<Tag>;
 }
 
 Script.init({

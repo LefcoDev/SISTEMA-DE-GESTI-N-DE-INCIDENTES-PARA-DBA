@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { saveAs } from 'file-saver';
 import * as XLSX from 'xlsx';
 import { Incident } from '../../services/incident.service';
@@ -18,6 +19,7 @@ interface ReportStats {
 }
 
 export default function Reports() {
+  const { t } = useTranslation();
   const { showModal } = useModal();
   const [activeTab, setActiveTab] = useState<'general' | 'trends'>('general');
   const [servers, setServers] = useState<Server[]>([]);
@@ -54,8 +56,8 @@ export default function Reports() {
     } catch (error) {
       console.error('Error fetching trends:', error);
       showModal({
-        title: 'Error',
-        message: 'Error al obtener análisis de tendencias',
+        title: t('common.error'),
+        message: t('reports.errors.fetchTrends'),
         type: 'error'
       });
     } finally {
@@ -72,8 +74,8 @@ export default function Reports() {
     } catch (error) {
       console.error('Error generating report:', error);
       showModal({
-        title: 'Error',
-        message: 'Error al generar el reporte',
+        title: t('common.error'),
+        message: t('reports.errors.generate'),
         type: 'error'
       });
       return [];
@@ -142,8 +144,8 @@ export default function Reports() {
     } catch (error) {
       console.error('Error exporting Excel report:', error);
       showModal({
-        title: 'Error',
-        message: 'Error al generar el reporte Excel',
+        title: t('common.error'),
+        message: t('reports.errors.exportExcel'),
         type: 'error'
       });
     } finally {
@@ -155,9 +157,9 @@ export default function Reports() {
     <div className="p-6">
       <div className="sm:flex sm:items-center">
         <div className="sm:flex-auto">
-          <h1 className="text-2xl font-bold text-gray-900">Reportes y Análisis</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{t('reports.title')}</h1>
           <p className="mt-2 text-sm text-gray-700">
-            Genera reportes detallados y analiza tendencias de incidentes.
+            {t('reports.description')}
           </p>
         </div>
       </div>
@@ -174,7 +176,7 @@ export default function Reports() {
             } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center`}
           >
             <ChartBarIcon className="h-5 w-5 mr-2" />
-            Reporte General
+            {t('reports.generalReport')}
           </button>
           <button
             onClick={() => {
@@ -188,7 +190,7 @@ export default function Reports() {
             } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center`}
           >
             <ArrowTrendingUpIcon className="h-5 w-5 mr-2" />
-            Análisis de Tendencias
+            {t('reports.trendsAnalysis')}
           </button>
         </nav>
       </div>
@@ -197,7 +199,7 @@ export default function Reports() {
       <div className="bg-white shadow rounded-lg p-6 mt-6 mb-6">
         <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2 lg:grid-cols-3">
           <div>
-            <label className="block text-sm font-medium text-gray-700">Fecha Inicio</label>
+            <label className="block text-sm font-medium text-gray-700">{t('reports.filters.startDate')}</label>
             <input
               type="date"
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border p-2"
@@ -206,7 +208,7 @@ export default function Reports() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">Fecha Fin</label>
+            <label className="block text-sm font-medium text-gray-700">{t('reports.filters.endDate')}</label>
             <input
               type="date"
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border p-2"
@@ -218,60 +220,60 @@ export default function Reports() {
           {activeTab === 'general' && (
             <>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Servidor</label>
+                <label className="block text-sm font-medium text-gray-700">{t('reports.filters.server')}</label>
                 <select
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border p-2"
                   value={filters.server_id}
                   onChange={(e) => setFilters({ ...filters, server_id: e.target.value })}
                 >
-                  <option value="">Todos</option>
+                  <option value="">{t('reports.filters.all')}</option>
                   {servers.map((server) => (
                     <option key={server.id} value={server.id}>{server.name}</option>
                   ))}
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Tipo</label>
+                <label className="block text-sm font-medium text-gray-700">{t('reports.filters.type')}</label>
                 <select
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border p-2"
                   value={filters.type}
                   onChange={(e) => setFilters({ ...filters, type: e.target.value })}
                 >
-                  <option value="">Todos</option>
-                  <option value="performance">Performance</option>
-                  <option value="availability">Disponibilidad</option>
-                  <option value="data_corruption">Corrupción de Datos</option>
-                  <option value="backup_restore">Backup/Restore</option>
-                  <option value="security">Seguridad</option>
-                  <option value="other">Otro</option>
+                  <option value="">{t('reports.filters.all')}</option>
+                  <option value="performance">{t('incidents.types.performance')}</option>
+                  <option value="availability">{t('incidents.types.availability')}</option>
+                  <option value="data_corruption">{t('incidents.types.data_corruption')}</option>
+                  <option value="backup_restore">{t('incidents.types.backup_restore')}</option>
+                  <option value="security">{t('incidents.types.security')}</option>
+                  <option value="other">{t('incidents.types.other')}</option>
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Severidad</label>
+                <label className="block text-sm font-medium text-gray-700">{t('reports.filters.severity')}</label>
                 <select
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border p-2"
                   value={filters.severity}
                   onChange={(e) => setFilters({ ...filters, severity: e.target.value })}
                 >
-                  <option value="">Todas</option>
-                  <option value="critical">Crítica</option>
-                  <option value="high">Alta</option>
-                  <option value="medium">Media</option>
-                  <option value="low">Baja</option>
+                  <option value="">{t('reports.filters.allSeverities')}</option>
+                  <option value="critical">{t('incidents.severity.critical')}</option>
+                  <option value="high">{t('incidents.severity.high')}</option>
+                  <option value="medium">{t('incidents.severity.medium')}</option>
+                  <option value="low">{t('incidents.severity.low')}</option>
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Estado</label>
+                <label className="block text-sm font-medium text-gray-700">{t('reports.filters.status')}</label>
                 <select
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border p-2"
                   value={filters.status}
                   onChange={(e) => setFilters({ ...filters, status: e.target.value })}
                 >
-                  <option value="">Todos</option>
-                  <option value="new">Nuevo</option>
-                  <option value="in_progress">En Progreso</option>
-                  <option value="resolved">Resuelto</option>
-                  <option value="closed">Cerrado</option>
+                  <option value="">{t('reports.filters.allStatuses')}</option>
+                  <option value="new">{t('incidents.status.new')}</option>
+                  <option value="in_progress">{t('incidents.status.in_progress')}</option>
+                  <option value="resolved">{t('incidents.status.resolved')}</option>
+                  <option value="closed">{t('incidents.status.closed')}</option>
                 </select>
               </div>
             </>
@@ -286,7 +288,7 @@ export default function Reports() {
                 disabled={loading}
                 className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
               >
-                Generar Reporte
+                {t('reports.generate')}
               </button>
               <button
                 onClick={handleExport}
@@ -311,7 +313,7 @@ export default function Reports() {
               disabled={loading}
               className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
             >
-              Actualizar Análisis
+              {t('reports.updateAnalysis')}
             </button>
           )}
         </div>
@@ -319,7 +321,7 @@ export default function Reports() {
 
       {activeTab === 'general' && stats && (
         <div className="mt-8">
-          <h2 className="text-lg font-medium text-gray-900 mb-4">Resumen del Reporte</h2>
+          <h2 className="text-lg font-medium text-gray-900 mb-4">{t('reports.stats.reportSummary')}</h2>
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
             <div className="bg-white overflow-hidden shadow rounded-lg">
               <div className="p-5">
@@ -329,7 +331,7 @@ export default function Reports() {
                   </div>
                   <div className="ml-5 w-0 flex-1">
                     <dl>
-                      <dt className="text-sm font-medium text-gray-500 truncate">Total Incidentes</dt>
+                      <dt className="text-sm font-medium text-gray-500 truncate">{t('reports.stats.totalIncidents')}</dt>
                       <dd className="text-lg font-medium text-gray-900">{stats.total}</dd>
                     </dl>
                   </div>
@@ -345,7 +347,7 @@ export default function Reports() {
                   </div>
                   <div className="ml-5 w-0 flex-1">
                     <dl>
-                      <dt className="text-sm font-medium text-gray-500 truncate">MTTR Promedio</dt>
+                      <dt className="text-sm font-medium text-gray-500 truncate">{t('reports.stats.mttr')}</dt>
                       <dd className="text-lg font-medium text-gray-900">{stats.mttr_minutes} min</dd>
                     </dl>
                   </div>
@@ -361,7 +363,7 @@ export default function Reports() {
                   </div>
                   <div className="ml-5 w-0 flex-1">
                     <dl>
-                      <dt className="text-sm font-medium text-gray-500 truncate">Críticos</dt>
+                      <dt className="text-sm font-medium text-gray-500 truncate">{t('reports.stats.critical')}</dt>
                       <dd className="text-lg font-medium text-red-600">{stats.by_severity['critical'] || 0}</dd>
                     </dl>
                   </div>
@@ -377,7 +379,7 @@ export default function Reports() {
                   </div>
                   <div className="ml-5 w-0 flex-1">
                     <dl>
-                      <dt className="text-sm font-medium text-gray-500 truncate">Resueltos</dt>
+                      <dt className="text-sm font-medium text-gray-500 truncate">{t('reports.stats.resolved')}</dt>
                       <dd className="text-lg font-medium text-green-600">{stats.by_status['resolved'] || 0}</dd>
                     </dl>
                   </div>
@@ -393,18 +395,18 @@ export default function Reports() {
           {/* Comparison Cards */}
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
             <div className="bg-white overflow-hidden shadow rounded-lg p-5">
-              <h3 className="text-lg font-medium text-gray-900">Comparativa de Período</h3>
+              <h3 className="text-lg font-medium text-gray-900">{t('reports.trends.comparison')}</h3>
               <div className="mt-4 grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-sm text-gray-500">Período Actual</p>
-                  <p className="text-2xl font-bold text-indigo-600">{trendData.currentStats.total} Incidentes</p>
+                  <p className="text-sm text-gray-500">{t('reports.trends.currentPeriod')}</p>
+                  <p className="text-2xl font-bold text-indigo-600">{trendData.currentStats.total} {t('reports.stats.incidents')}</p>
                   <p className="text-xs text-gray-400">
                     {formatDate(new Date(trendData.period.start), 'short')} - {formatDate(new Date(trendData.period.end), 'short')}
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Período Anterior</p>
-                  <p className="text-2xl font-bold text-gray-600">{trendData.previousStats.total} Incidentes</p>
+                  <p className="text-sm text-gray-500">{t('reports.trends.previousPeriod')}</p>
+                  <p className="text-2xl font-bold text-gray-600">{trendData.previousStats.total} {t('reports.stats.incidents')}</p>
                   <p className="text-xs text-gray-400">
                     {formatDate(new Date(trendData.previousPeriod.start), 'short')} - {formatDate(new Date(trendData.previousPeriod.end), 'short')}
                   </p>
@@ -413,7 +415,7 @@ export default function Reports() {
             </div>
 
             <div className="bg-white overflow-hidden shadow rounded-lg p-5">
-              <h3 className="text-lg font-medium text-gray-900">Top Servidores Problemáticos</h3>
+              <h3 className="text-lg font-medium text-gray-900">{t('reports.trends.topServers')}</h3>
               <ul className="mt-4 space-y-2">
                 {trendData.currentStats.byServer.map((item) => (
                   <li key={item.server_id} className="flex justify-between items-center">

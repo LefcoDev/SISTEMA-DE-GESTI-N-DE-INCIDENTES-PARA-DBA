@@ -70,6 +70,8 @@ export default function IncidentDetail() {
   const [incident, setIncident] = useState<IncidentDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
+  const [availableTags, setAvailableTags] = useState<Array<{ id: number; name: string; color: string }>>([]);
+  const [showTagSelector, setShowTagSelector] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const fetchIncident = async () => {
@@ -86,8 +88,47 @@ export default function IncidentDetail() {
   useEffect(() => {
     if (id) {
       fetchIncident();
+      loadAvailableTags();
     }
   }, [id]);
+
+  const loadAvailableTags = async () => {
+    try {
+      const response = await api.get('/tags');
+      setAvailableTags(response.data);
+    } catch (error) {
+      console.error('Error loading tags:', error);
+    }
+  };
+
+  const handleAddTag = async (tagId: number) => {
+    try {
+      const response = await api.post(`/incidents/${id}/tags`, { tagId });
+      setIncident(response.data);
+      setShowTagSelector(false);
+    } catch (error: any) {
+      console.error('Error adding tag:', error);
+      showModal({
+        title: 'Error',
+        message: error.response?.data?.message || 'Error al agregar etiqueta',
+        type: 'error'
+      });
+    }
+  };
+
+  const handleRemoveTag = async (tagId: number) => {
+    try {
+      const response = await api.delete(`/incidents/${id}/tags/${tagId}`);
+      setIncident(response.data);
+    } catch (error) {
+      console.error('Error removing tag:', error);
+      showModal({
+        title: 'Error',
+        message: 'Error al eliminar etiqueta',
+        type: 'error'
+      });
+    }
+  };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || !e.target.files[0]) return;
@@ -192,20 +233,52 @@ export default function IncidentDetail() {
             
             {/* Tags Section */}
             <div className="sm:col-span-2">
-              <dt className="text-sm font-medium text-gray-500 flex items-center">
-                <TagIcon className="h-4 w-4 mr-1" />
-                Etiquetas
+              <dt className="text-sm font-medium text-gray-500 flex items-center justify-between mb-2">
+                <div className="flex items-center">
+                  <TagIcon className="h-4 w-4 mr-1" />
+                  Etiquetas
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowTagSelector(!showTagSelector)}
+                  className="inline-flex items-center rounded bg-white px-2 py-1 text-xs font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+                >
+                  <PlusIcon className="h-3 w-3 mr-1" />
+                  Agregar
+                </button>
               </dt>
-              <dd className="mt-1 text-sm text-gray-900">
+              <dd className="text-sm text-gray-900">
+                {showTagSelector && (
+                  <div className="mb-3 p-3 bg-gray-50 rounded-lg">
+                    <p className="text-xs text-gray-600 mb-2">Selecciona una etiqueta:</p>
+                    <div className="flex flex-wrap gap-2">
+                      {availableTags
+                        .filter(tag => !incident.Tags?.some(t => t.id === tag.id))
+                        .map(tag => (
+                          <button
+                            key={tag.id}
+                            onClick={() => handleAddTag(tag.id)}
+                            className="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset hover:opacity-80"
+                            style={{ backgroundColor: `${tag.color}20`, color: tag.color }}
+                          >
+                            {tag.name}
+                          </button>
+                        ))}
+                    </div>
+                  </div>
+                )}
                 <div className="flex flex-wrap gap-2">
                   {incident.Tags && incident.Tags.length > 0 ? (
                     incident.Tags.map(tag => (
                       <span
                         key={tag.id}
-                        className="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset"
+                        className="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset group cursor-pointer"
                         style={{ backgroundColor: `${tag.color}20`, color: tag.color }}
+                        onClick={() => handleRemoveTag(tag.id)}
+                        title="Click para eliminar"
                       >
                         {tag.name}
+                        <span className="ml-1 opacity-0 group-hover:opacity-100">×</span>
                       </span>
                     ))
                   ) : (

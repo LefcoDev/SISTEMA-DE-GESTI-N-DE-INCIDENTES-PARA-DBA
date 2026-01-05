@@ -1,0 +1,523 @@
+{
+  "common": {
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "close": "Cerrar",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "loading": "Cargando...",
+    "noData": "No hay datos disponibles",
+    "actions": "Acciones",
+    "status": "Estado",
+    "date": "Fecha",
+    "type": "Tipo",
+    "description": "Descripción",
+    "confirm": "Confirmar",
+    "error": "Error",
+    "success": "Éxito"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "incidents": "Incidentes",
+    "servers": "Servidores",
+    "monitoring": "Monitoreo",
+    "scripts": "Scripts",
+    "solutions": "Soluciones",
+    "tags": "Etiquetas",
+    "users": "Usuarios",
+    "audit": "Auditoría",
+    "settings": "Configuración",
+    "logout": "Cerrar Sesión",
+    "notes": "Notas",
+    "reminders": "Recordatorios",
+    "knowledge": "Aprendizaje",
+    "reports": "Reportes",
+    "search": "Búsqueda"
+  },
+  "auth": {
+    "login": "Iniciar Sesión",
+    "username": "Usuario",
+    "password": "Contraseña",
+    "rememberMe": "Recordarme",
+    "forgotPassword": "¿Olvidaste tu contraseña?",
+    "loginError": "Usuario o contraseña incorrectos",
+    "welcomeBack": "Bienvenido de nuevo",
+    "signInToContinue": "Inicia sesión para continuar"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "activeIncidents": "Incidentes Activos",
+    "resolvedThisMonth": "Resueltos (Mes)",
+    "monitoredServers": "Servidores Monitoreados",
+    "serversOnline": "Servidores Online",
+    "serverStatusTitle": "Estado de Servidores y Base de Datos",
+    "serverName": "Servidor",
+    "hostIP": "Host / IP",
+    "dbEngine": "Motor BD",
+    "serverStatusPing": "Estado Servidor (Ping)",
+    "dbStatus": "Estado BD (Puerto)",
+    "online": "Online",
+    "offline": "Offline",
+    "noServers": "No hay servidores registrados"
+  },
+  "incidents": {
+    "title": "Incidentes",
+    "newIncident": "Nuevo Incidente",
+    "editIncident": "Editar Incidente",
+    "incidentDetails": "Detalles del Incidente",
+    "description": "Lista de incidentes registrados en los servidores de base de datos.",
+    "errorLoading": "Error al cargar los incidentes",
+    "errorDeleting": "Error al eliminar el incidente",
+    "confirmDelete": "¿Estás seguro de que deseas eliminar este incidente?",
+    "fields": {
+      "title": "Título",
+      "description": "Descripción",
+      "severity": "Severidad",
+      "priority": "Prioridad",
+      "status": "Estado",
+      "server": "Servidor",
+      "assignedTo": "Asignado a",
+      "createdBy": "Creado por",
+      "createdAt": "Fecha de creación",
+      "updatedAt": "Última actualización",
+      "resolvedAt": "Fecha de resolución"
+    },
+    "severity": {
+      "low": "Baja",
+      "medium": "Media",
+      "high": "Alta",
+      "critical": "Crítica"
+    },
+    "status": {
+      "new": "Nuevo",
+      "open": "Abierto",
+      "in_progress": "En Progreso",
+      "resolved": "Resuelto",
+      "closed": "Cerrado"
+    },
+    "priority": {
+      "low": "Baja",
+      "medium": "Media",
+      "high": "Alta",
+      "urgent": "Urgente"
+    }
+  },
+  "servers": {
+    "title": "Servidores",
+    "newServer": "Nuevo Servidor",
+    "editServer": "Editar Servidor",
+    "serverDetails": "Detalles del Servidor",
+    "description": "Lista de todos los servidores de base de datos registrados en el sistema.",
+    "errorLoading": "Error al cargar los servidores",
+    "errorDeleting": "Error al eliminar el servidor",
+    "confirmDelete": "¿Estás seguro de que deseas eliminar este servidor?",
+    "database": "Base de Datos",
+    "operatingSystem": "Sistema Operativo",
+    "environment": "Ambiente",
+    "status": "Estado",
+    "actions": "Acciones",
+    "fields": {
+      "name": "Nombre",
+      "host": "Host",
+      "port": "Puerto",
+      "engineType": "Motor de Base de Datos",
+      "username": "Usuario",
+      "password": "Contraseña",
+      "database": "Base de Datos",
+      "description": "Descripción",
+      "isActive": "Activo"
+    },
+    "engineTypes": {
+      "mysql": "MySQL",
+      "postgresql": "PostgreSQL",
+      "oracle": "Oracle",
+      "sqlserver": "SQL Server",
+      "mongodb": "MongoDB"
+    }
+  },
+  "monitoring": {
+    "title": "Monitoreo",
+    "description": "Panel de monitoreo de servidores y bases de datos en tiempo real.",
+    "healthCheck": "Verificación de Salud",
+    "lastCheck": "Última Verificación",
+    "responseTime": "Tiempo de Respuesta",
+    "uptime": "Tiempo Activo",
+    "alertsActive": "Alertas Activas",
+    "performanceMetrics": "Métricas de Rendimiento",
+    "runHealthCheck": "Ejecutar Verificación",
+    "serverHealth": "Salud del Servidor",
+    "healthy": "Saludable",
+    "unhealthy": "No Saludable",
+    "totalServers": "Total Servidores",
+    "online": "Online",
+    "offline": "Offline",
+    "avgResponseTime": "Tiempo Promedio"
+  },
+  "scripts": {
+    "title": "Scripts",
+    "newScript": "Nuevo Script",
+    "editScript": "Editar Script",
+    "runScript": "Ejecutar Script",
+    "description": "Repositorio de scripts SQL y comandos para administración de bases de datos.",
+    "errorLoading": "Error al cargar los scripts",
+    "errorDeleting": "Error al eliminar el script",
+    "confirmDelete": "¿Estás seguro de que deseas eliminar este script?",
+    "executeScript": "Ejecutar",
+    "libraryTitle": "Biblioteca de Scripts",
+    "loading": "Cargando scripts...",
+    "usage": "Uso",
+    "fields": {
+      "name": "Nombre",
+      "description": "Descripción",
+      "content": "Contenido",
+      "language": "Lenguaje",
+      "category": "Categoría"
+    }
+  },
+  "solutions": {
+    "title": "Soluciones",
+    "newSolution": "Nueva Solución",
+    "editSolution": "Editar Solución",
+    "description": "Registro de soluciones aplicadas a incidentes y base de conocimiento.",
+    "errorLoading": "Error al cargar las soluciones",
+    "errorDeleting": "Error al eliminar la solución",
+    "confirmDelete": "¿Estás seguro de que deseas eliminar esta solución?",
+    "loading": "Cargando soluciones...",
+    "searchPlaceholder": "Buscar soluciones...",
+    "all": "Todos",
+    "solutionsFilter": "Soluciones",
+    "templates": "Plantillas",
+    "fields": {
+      "title": "Título",
+      "description": "Descripción",
+      "steps": "Pasos",
+      "incident": "Incidente",
+      "type": "Tipo",
+      "appliedBy": "Aplicado por",
+      "date": "Fecha"
+    }
+  },
+  "tags": {
+    "title": "Etiquetas",
+    "newTag": "Nueva Etiqueta",
+    "editTag": "Editar Etiqueta",
+    "fields": {
+      "name": "Nombre",
+      "color": "Color"
+    }
+  },
+  "users": {
+    "title": "Usuarios",
+    "newUser": "Nuevo Usuario",
+    "editUser": "Editar Usuario",
+    "fields": {
+      "username": "Usuario",
+      "email": "Correo Electrónico",
+      "name": "Nombre",
+      "role": "Rol",
+      "isActive": "Activo",
+      "password": "Contraseña",
+      "confirmPassword": "Confirmar Contraseña"
+    },
+    "roles": {
+      "admin": "Administrador",
+      "user": "Usuario",
+      "viewer": "Visualizador"
+    }
+  },
+  "audit": {
+    "title": "Auditoría",
+    "description": "Registro de actividades y cambios en el sistema.",
+    "logs": "Registros de Auditoría",
+    "searchPlaceholder": "Buscar por usuario, entidad o acción...",
+    "allEntities": "Todas las Entidades",
+    "allActions": "Todas las Acciones",
+    "loading": "Cargando registros...",
+    "noRecords": "No se encontraron registros",
+    "viewDetails": "Ver detalles",
+    "detailsTitle": "Detalles del Registro de Auditoría",
+    "deleteConfirm": "¿Estás seguro de eliminar este registro de auditoría? Esta acción no se puede deshacer.",
+    "fields": {
+      "date": "Fecha",
+      "user": "Usuario",
+      "action": "Acción",
+      "entity": "Entidad",
+      "changes": "Cambios",
+      "ip": "IP",
+      "actions": "Acciones",
+      "timestamp": "Fecha y Hora",
+      "details": "Detalles",
+      "ipAddress": "Dirección IP",
+      "oldValue": "Valor Anterior",
+      "newValue": "Valor Nuevo",
+      "data": "Datos"
+    },
+    "entities": {
+      "USER": "Usuarios",
+      "SERVER": "Servidores",
+      "INCIDENT": "Incidentes",
+      "SOLUTION": "Soluciones",
+      "SCRIPT": "Scripts",
+      "AUTH": "Autenticación"
+    },
+    "actions": {
+      "CREATE": "Creación",
+      "UPDATE": "Actualización",
+      "DELETE": "Eliminación",
+      "LOGIN": "Login",
+      "REGISTER": "Registro"
+    }
+  },
+  "settings": {
+    "title": "Configuración",
+    "tabs": {
+      "profile": "Perfil",
+      "password": "Contraseña",
+      "notifications": "Notificaciones",
+      "language": "Idioma"
+    },
+    "profile": {
+      "title": "Perfil de Usuario",
+      "editProfile": "Editar Perfil",
+      "cancel": "Cancelar",
+      "avatar": "Foto de Perfil",
+      "changeAvatar": "Cambiar Foto",
+      "removeAvatar": "Eliminar Foto",
+      "saveChanges": "Guardar Cambios",
+      "logout": "Cerrar Sesión"
+    },
+    "password": {
+      "title": "Cambiar Contraseña",
+      "description": "Actualiza tu contraseña para mantener tu cuenta segura",
+      "currentPassword": "Contraseña Actual",
+      "newPassword": "Nueva Contraseña",
+      "confirmPassword": "Confirmar Contraseña",
+      "updatePassword": "Actualizar Contraseña"
+    },
+    "users": {
+      "title": "Gestión de Usuarios",
+      "newUser": "Nuevo Usuario",
+      "loading": "Cargando usuarios...",
+      "editUser": "Editar Usuario",
+      "createUser": "Crear Nuevo Usuario",
+      "fullName": "Nombre Completo",
+      "username": "Usuario",
+      "email": "Correo Electrónico",
+      "role": "Rol",
+      "password": "Contraseña",
+      "active": "Activo",
+      "actions": "Acciones"
+    },
+    "tags": {
+      "title": "Gestión de Tags",
+      "tagName": "Nombre del Tag",
+      "color": "Color",
+      "createTag": "Crear Tag",
+      "loading": "Cargando tags...",
+      "name": "Nombre",
+      "usage": "Uso",
+      "actions": "Acciones"
+    },
+    "backups": {
+      "title": "Copias de Seguridad",
+      "createBackup": "Crear Backup Manual",
+      "creating": "Creando...",
+      "loading": "Cargando backups...",
+      "warning": "Los backups incluyen toda la base de datos (usuarios, servidores, incidentes, etc.). Al restaurar, se reemplazarán todos los datos actuales.",
+      "file": "Archivo",
+      "date": "Fecha",
+      "size": "Tamaño",
+      "actions": "Acciones",
+      "restore": "Restaurar",
+      "delete": "Eliminar",
+      "noBackups": "No hay backups disponibles"
+    },
+    "menu": {
+      "title": "Personalización del Menú",
+      "description": "Arrastra los elementos para reordenar el menú lateral. Desactiva los elementos que no necesites.",
+      "required": "Requerido",
+      "resetToDefault": "Restaurar valores por defecto"
+    },
+    "appearance": {
+      "darkMode": "Tema Oscuro",
+      "darkModeDesc": "Habilitar modo oscuro para la interfaz"
+    },
+    "notifications": {
+      "title": "Preferencias de Notificaciones",
+      "emailNotifications": "Notificaciones por Correo",
+      "desktopNotifications": "Notificaciones de Escritorio",
+      "incidentAlerts": "Alertas de Incidentes",
+      "monitoringAlerts": "Alertas de Monitoreo"
+    },
+    "language": {
+      "title": "Idioma",
+      "selectLanguage": "Seleccionar Idioma",
+      "spanish": "Español",
+      "english": "Inglés"
+    }
+  },
+  "closeAppModal": {
+    "title": "¿Cerrar aplicación?",
+    "message": "¿Qué deseas hacer?",
+    "minimize": "Minimizar a la bandeja",
+    "close": "Cerrar aplicación",
+    "cancel": "Cancelar"
+  },
+  "notes": {
+    "title": "Mis Notas",
+    "newNote": "Nueva Nota",
+    "editNote": "Editar Nota",
+    "description": "Gestiona tus notas adhesivas, ideas y recordatorios.",
+    "allNotes": "Todas las Notas",
+    "pinned": "Fijadas",
+    "recent": "Recientes",
+    "searchPlaceholder": "Buscar notas...",
+    "showArchived": "Mostrar archivadas"
+  },
+  "reminders": {
+    "title": "Recordatorios",
+    "newReminder": "Nuevo Recordatorio",
+    "editReminder": "Editar Recordatorio",
+    "description": "Gestiona tus tareas y plazos.",
+    "upcoming": "Próximos",
+    "overdue": "Vencidos",
+    "completed": "Completados",
+    "pending": "Pendiente",
+    "filters": "Filtros",
+    "allStatus": "Todos los estados",
+    "allPriorities": "Todas las prioridades",
+    "noResults": "No se encontraron recordatorios que coincidan con tus filtros.",
+    "priority": {
+      "low": "Baja",
+      "medium": "Media",
+      "high": "Alta",
+      "critical": "Crítica"
+    }
+  },
+  "knowledge": {
+    "title": "Base de Conocimiento",
+    "newEntry": "Nuevo Nugget",
+    "editEntry": "Editar Entrada",
+    "description": "Captura y comparte nuggets de conocimiento.",
+    "categories": "Categorías",
+    "recentEntries": "Entradas Recientes",
+    "filters": "Filtros",
+    "allCategories": "Todas las categorías",
+    "allLevels": "Todos los niveles",
+    "searchPlaceholder": "Buscar nuggets o etiquetas...",
+    "category": {
+      "til": "Hoy Aprendí",
+      "bestPractice": "Buena Práctica",
+      "gotcha": "Trampa",
+      "quickTip": "Consejo Rápido",
+      "commandRef": "Referencia de Comando",
+      "troubleshooting": "Solución de Problemas"
+    },
+    "complexity": {
+      "beginner": "Principiante",
+      "intermediate": "Intermedio",
+      "advanced": "Avanzado",
+      "expert": "Experto"
+    }
+  },
+  "reports": {
+    "title": "Reportes y Análisis",
+    "description": "Genera reportes detallados y analiza tendencias de incidentes.",
+    "generate": "Generar Reporte",
+    "export": "Exportar",
+    "dateRange": "Rango de Fechas",
+    "incidentReport": "Reporte de Incidentes",
+    "serverReport": "Reporte de Servidores",
+    "generalReport": "Reporte General",
+    "trendsAnalysis": "Análisis de Tendencias",
+    "updateAnalysis": "Actualizar Análisis",
+    "exportExcel": "Exportar a Excel",
+    "filters": {
+      "startDate": "Fecha Inicio",
+      "endDate": "Fecha Fin",
+      "server": "Servidor",
+      "type": "Tipo",
+      "severity": "Severidad",
+      "status": "Estado",
+      "all": "Todos",
+      "allSeverities": "Todas",
+      "allStatuses": "Todos"
+    },
+    "stats": {
+      "total": "Total Incidentes",
+      "bySeverity": "Por Severidad",
+      "byStatus": "Por Estado",
+      "byType": "Por Tipo",
+      "mttr": "MTTR (Tiempo Promedio de Resolución)",
+      "totalIncidents": "Total Incidentes",
+      "critical": "Críticos",
+      "resolved": "Resueltos",
+      "reportSummary": "Resumen del Reporte",
+      "incidents": "Incidentes"
+    },
+    "trends": {
+      "comparison": "Comparativa de Período",
+      "currentPeriod": "Período Actual",
+      "previousPeriod": "Período Anterior",
+      "topServers": "Top Servidores Problemáticos"
+    },
+    "errors": {
+      "generateReport": "Error al generar el reporte",
+      "exportExcel": "Error al generar el reporte Excel",
+      "fetchTrends": "Error al obtener análisis de tendencias",
+      "generate": "Error al generar el reporte"
+    }
+  },
+  "search": {
+    "title": "Búsqueda Global",
+    "description": "Busca en incidentes, servidores, scripts y soluciones.",
+    "placeholder": "Buscar incidentes, servidores, scripts...",
+    "results": "Resultados",
+    "noResults": "No se encontraron resultados",
+    "searchIn": "Buscar en",
+    "searching": "Buscando..."
+  },
+  "chat": {
+    "title": "Chat",
+    "newChat": "Nuevo Chat",
+    "directChat": "Chat Directo",
+    "groupChat": "Chat Grupal",
+    "globalChat": "Chat Global",
+    "noConversations": "No hay conversaciones",
+    "noMessages": "No hay mensajes",
+    "selectConversation": "Selecciona una conversación",
+    "selectConversationDesc": "Elige un chat de la lista o selecciona un usuario",
+    "typeMessage": "Escribe un mensaje...",
+    "send": "Enviar",
+    "participants": "participantes",
+    "yesterday": "Ayer",
+    "createGroup": "Crear Grupo",
+    "startDirectChat": "Iniciar Chat Directo",
+    "groupName": "Nombre del Grupo",
+    "selectUsers": "Seleccionar Usuarios",
+    "users": "Usuarios",
+    "searchUsers": "Buscar usuarios...",
+    "noUsers": "No hay usuarios disponibles",
+    "noUsersFound": "No se encontraron usuarios",
+    "online": "En línea",
+    "offline": "Desconectado"
+  },
+  "validation": {
+    "required": "Este campo es requerido",
+    "email": "Correo electrónico inválido",
+    "minLength": "Debe tener al menos {{min}} caracteres",
+    "maxLength": "No puede exceder {{max}} caracteres",
+    "passwordMatch": "Las contraseñas no coinciden",
+    "invalidFormat": "Formato inválido"
+  },
+  "messages": {
+    "saveSuccess": "Guardado exitosamente",
+    "deleteSuccess": "Eliminado exitosamente",
+    "updateSuccess": "Actualizado exitosamente",
+    "createSuccess": "Creado exitosamente",
+    "operationFailed": "La operación falló",
+    "confirmDelete": "¿Estás seguro de que deseas eliminar esto?"
+  }
+}

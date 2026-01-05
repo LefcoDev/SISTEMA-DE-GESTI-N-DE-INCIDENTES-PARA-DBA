@@ -3,6 +3,7 @@ import { Dialog, Transition } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import MonacoEditor from 'react-monaco-editor';
 import { scriptService, Script } from '../../services/script.service';
+import { tagService } from '../../services/tag.service';
 
 interface ScriptModalProps {
   isOpen: boolean;
@@ -19,12 +20,16 @@ export default function ScriptModal({ isOpen, onClose, onSave, script }: ScriptM
     code: '',
     category: 'maintenance',
     engine_compatible: '',
-    parameters_description: '',
-    tags: ''
+    parameters_description: ''
   });
+  const [selectedTags, setSelectedTags] = useState<number[]>([]);
+  const [availableTags, setAvailableTags] = useState<Array<{ id: number; name: string; color: string }>>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    if (isOpen) {
+      loadAvailableTags();
+    }
     if (script) {
       setFormData({
         name: script.name,
@@ -33,9 +38,9 @@ export default function ScriptModal({ isOpen, onClose, onSave, script }: ScriptM
         code: script.code,
         category: script.category,
         engine_compatible: script.engine_compatible || '',
-        parameters_description: script.parameters_description || '',
-        tags: script.tags ? script.tags.map(t => t.name).join(', ') : ''
+        parameters_description: script.parameters_description || ''
       });
+      setSelectedTags(script.tags ? script.tags.map(t => t.id) : []);
     } else {
       setFormData({
         name: '',
@@ -44,11 +49,26 @@ export default function ScriptModal({ isOpen, onClose, onSave, script }: ScriptM
         code: '',
         category: 'maintenance',
         engine_compatible: '',
-        parameters_description: '',
-        tags: ''
+        parameters_description: ''
       });
+      setSelectedTags([]);
     }
-  }, [script]);
+  }, [script, isOpen]);
+
+  const loadAvailableTags = async () => {
+    try {
+      const data = await tagService.getAll();
+      setAvailableTags(data);
+    } catch (error) {
+      console.error('Error loading tags:', error);
+    }
+  };
+
+  const toggleTag = (tagId: number) => {
+    setSelectedTags(prev =>
+      prev.includes(tagId) ? prev.filter(id => id !== tagId) : [...prev, tagId]
+    );
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,7 +76,7 @@ export default function ScriptModal({ isOpen, onClose, onSave, script }: ScriptM
     try {
       const dataToSubmit = {
         ...formData,
-        tags: formData.tags.split(',').map(t => t.trim()).filter(t => t)
+        tags: selectedTags
       };
 
       if (script) {
@@ -203,18 +223,33 @@ export default function ScriptModal({ isOpen, onClose, onSave, script }: ScriptM
                         </div>
 
                         <div>
-                          <label htmlFor="tags" className="block text-sm font-medium text-gray-700">
-                            Tags (separados por coma)
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Tags
                           </label>
-                          <input
-                            type="text"
-                            name="tags"
-                            id="tags"
-                            value={formData.tags}
-                            onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
-                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border p-2"
-                            placeholder="ej. backup, diario, critico"
-                          />
+                          <div className="flex flex-wrap gap-2 p-3 border border-gray-300 rounded-md bg-gray-50 min-h-[60px]">
+                            {availableTags.map(tag => (
+                              <button
+                                key={tag.id}
+                                type="button"
+                                onClick={() => toggleTag(tag.id)}
+                                className={`px-3 py-1 text-xs font-medium rounded-full transition-all ${
+                                  selectedTags.includes(tag.id)
+                                    ? 'ring-2 ring-offset-1'
+                                    : 'opacity-60 hover:opacity-100'
+                                }`}
+                                style={{
+                                  backgroundColor: `${tag.color}20`,
+                                  color: tag.color,
+                                  borderColor: selectedTags.includes(tag.id) ? tag.color : 'transparent'
+                                }}
+                              >
+                                {tag.name}
+                              </button>
+                            ))}
+                            {availableTags.length === 0 && (
+                              <span className="text-sm text-gray-400">No hay tags disponibles</span>
+                            )}
+                          </div>
                         </div>
 
                         <div>

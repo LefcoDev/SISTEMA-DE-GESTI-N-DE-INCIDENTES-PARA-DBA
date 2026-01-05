@@ -28,14 +28,26 @@ export class IncidentService {
       }
     }
 
+    const includeOptions: any[] = [
+      { model: Server, as: 'server', attributes: ['id', 'name', 'host'] },
+      { model: User, as: 'assignee', attributes: ['id', 'full_name', 'email'] },
+      { model: User, as: 'creator', attributes: ['id', 'full_name', 'email'] },
+      { model: Tag, through: { attributes: [] } }
+    ];
+
+    // If filtering by tags, add condition
+    if (filters.tags && Array.isArray(filters.tags) && filters.tags.length > 0) {
+      includeOptions[3] = {
+        model: Tag,
+        through: { attributes: [] },
+        where: { id: filters.tags },
+        required: true
+      };
+    }
+
     return await Incident.findAll({
       where,
-      include: [
-        { model: Server, as: 'server', attributes: ['id', 'name', 'host'] },
-        { model: User, as: 'assignee', attributes: ['id', 'full_name', 'email'] },
-        { model: User, as: 'creator', attributes: ['id', 'full_name', 'email'] },
-        { model: Tag, through: { attributes: [] } }
-      ],
+      include: includeOptions,
       order: [['created_at', 'DESC']],
     });
   }

@@ -16,7 +16,7 @@ export default defineConfig({
   },
   server: {
     port: 5173,
-    strictPort: true,
+    strictPort: false, // Permite buscar otro puerto si 5173 está ocupado
   },
   base: './',
   build: {

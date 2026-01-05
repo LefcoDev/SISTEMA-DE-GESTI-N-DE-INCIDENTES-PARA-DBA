@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { PlusIcon, FunnelIcon } from '@heroicons/react/24/outline';
 import { KnowledgeNugget, CreateNuggetDTO, NuggetCategory, ComplexityLevel } from '../../features/knowledge/types/knowledge.types';
 import { knowledgeService } from '../../features/knowledge/services/knowledge.service';
@@ -7,6 +8,7 @@ import KnowledgeNuggetForm from '../../features/knowledge/components/KnowledgeNu
 import { useModal } from '../../context/ModalContext';
 
 export const KnowledgeDashboard: React.FC = () => {
+  const { t } = useTranslation();
   const [nuggets, setNuggets] = useState<KnowledgeNugget[]>([]);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingNugget, setEditingNugget] = useState<KnowledgeNugget | null>(null);
@@ -80,8 +82,8 @@ export const KnowledgeDashboard: React.FC = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Knowledge Base</h1>
-          <p className="text-sm text-gray-500">Capture and share knowledge nuggets</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('knowledge.title')}</h1>
+          <p className="text-sm text-gray-500">{t('knowledge.description')}</p>
         </div>
         <button
           onClick={() => {
@@ -91,14 +93,14 @@ export const KnowledgeDashboard: React.FC = () => {
           className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
         >
           <PlusIcon className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
-          New Nugget
+          {t('knowledge.newEntry')}
         </button>
       </div>
 
       <div className="bg-white p-4 rounded-lg shadow flex flex-wrap gap-4 items-center">
         <div className="flex items-center text-gray-500">
           <FunnelIcon className="h-5 w-5 mr-2" />
-          <span className="text-sm font-medium">Filters:</span>
+          <span className="text-sm font-medium">{t('knowledge.filters')}:</span>
         </div>
         
         <select
@@ -106,13 +108,13 @@ export const KnowledgeDashboard: React.FC = () => {
           onChange={(e) => setFilterCategory(e.target.value as any)}
           className="block w-40 rounded-md border-gray-300 py-1.5 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm border p-2"
         >
-          <option value="all">All Categories</option>
-          <option value="til">Today I Learned</option>
-          <option value="best_practice">Best Practice</option>
-          <option value="gotcha">Gotcha</option>
-          <option value="quick_tip">Quick Tip</option>
-          <option value="command_ref">Command Ref</option>
-          <option value="troubleshooting">Troubleshooting</option>
+          <option value="all">{t('knowledge.allCategories')}</option>
+          <option value="til">{t('knowledge.category.til')}</option>
+          <option value="best_practice">{t('knowledge.category.bestPractice')}</option>
+          <option value="gotcha">{t('knowledge.category.gotcha')}</option>
+          <option value="quick_tip">{t('knowledge.category.quickTip')}</option>
+          <option value="command_ref">{t('knowledge.category.commandRef')}</option>
+          <option value="troubleshooting">{t('knowledge.category.troubleshooting')}</option>
         </select>
 
         <select
@@ -120,18 +122,18 @@ export const KnowledgeDashboard: React.FC = () => {
           onChange={(e) => setFilterComplexity(e.target.value as any)}
           className="block w-40 rounded-md border-gray-300 py-1.5 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm border p-2"
         >
-          <option value="all">All Levels</option>
-          <option value="beginner">Beginner</option>
-          <option value="intermediate">Intermediate</option>
-          <option value="advanced">Advanced</option>
-          <option value="expert">Expert</option>
+          <option value="all">{t('knowledge.allLevels')}</option>
+          <option value="beginner">{t('knowledge.complexity.beginner')}</option>
+          <option value="intermediate">{t('knowledge.complexity.intermediate')}</option>
+          <option value="advanced">{t('knowledge.complexity.advanced')}</option>
+          <option value="expert">{t('knowledge.complexity.expert')}</option>
         </select>
 
         <input
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Search nuggets or tags..."
+          placeholder={t('knowledge.searchPlaceholder')}
           className="block w-64 rounded-md border-gray-300 py-1.5 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm border p-2"
         />
       </div>

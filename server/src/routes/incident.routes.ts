@@ -8,6 +8,7 @@ import {
   deleteIncident,
   uploadAttachment,
 } from '../controllers/incident.controller';
+import { addTagToIncident, removeTagFromIncident } from '../controllers/incident-tag.controller';
 import { authenticate } from '../middlewares/auth.middleware';
 import { createIncidentValidator, updateIncidentValidator } from '../validators/incident.validator';
 import { validate } from '../middlewares/validate.middleware';
@@ -24,5 +25,7 @@ router.post('/', createIncidentValidator, validate, createIncident);
 router.put('/:id', updateIncidentValidator, validate, updateIncident);
 router.delete('/:id', deleteIncident);
 router.post('/:id/attachments', uploadMiddleware.single('file'), uploadAttachment);
+router.post('/:id/tags', addTagToIncident);
+router.delete('/:id/tags/:tagId', removeTagFromIncident);
 
 export default router;

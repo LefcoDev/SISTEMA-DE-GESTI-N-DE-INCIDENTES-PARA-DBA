@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Tab } from '@headlessui/react';
 import { PlusIcon, PencilSquareIcon, TrashIcon } from '@heroicons/react/24/outline';
 
@@ -26,6 +27,7 @@ interface Server {
 }
 
 export default function ServerList() {
+  const { t } = useTranslation();
   const [servers, setServers] = useState<Server[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -46,7 +48,7 @@ export default function ServerList() {
       setServers(response.data);
     } catch (error) {
       console.error('Error fetching servers:', error);
-      showModal({ type: 'error', title: 'Error', message: 'Error al cargar los servidores' });
+      showModal({ type: 'error', title: t('common.error'), message: t('servers.errorLoading') });
     } finally {
       setLoading(false);
     }
@@ -99,16 +101,16 @@ export default function ServerList() {
   };
 
   if (loading) {
-    return <div>Cargando...</div>;
+    return <div>{t('common.loading')}</div>;
   }
 
   return (
     <div className="px-4 sm:px-6 lg:px-8">
       <div className="sm:flex sm:items-center">
         <div className="sm:flex-auto">
-          <h1 className="text-base font-semibold leading-6 text-gray-900">Servidores</h1>
+          <h1 className="text-base font-semibold leading-6 text-gray-900">{t('servers.title')}</h1>
           <p className="mt-2 text-sm text-gray-700">
-            Lista de todos los servidores de base de datos registrados en el sistema.
+            {t('servers.description')}
           </p>
         </div>
         <div className="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
@@ -118,7 +120,7 @@ export default function ServerList() {
             className="block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             <PlusIcon className="h-5 w-5 inline-block mr-1" />
-            {selectedTab === 0 ? 'Nuevo Servidor' : 'Nueva Base de Datos'}
+            {selectedTab === 0 ? t('servers.newServer') : t('servers.newServer')}
           </button>
         </div>
       </div>
@@ -136,7 +138,7 @@ export default function ServerList() {
                 )
               }
             >
-              Servidores
+              {t('servers.title')}
             </Tab>
             <Tab
               className={({ selected }) =>
@@ -149,7 +151,7 @@ export default function ServerList() {
                 )
               }
             >
-              Base de Datos
+              {t('servers.database')}
             </Tab>
           </Tab.List>
           <Tab.Panels>
@@ -158,12 +160,12 @@ export default function ServerList() {
                 <table className="min-w-full divide-y divide-gray-300">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">Nombre</th>
-                      <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Host</th>
-                      <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Sistema Operativo</th>
-                      <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Ambiente</th>
-                      <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Estado</th>
-                      <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6"><span className="sr-only">Acciones</span></th>
+                      <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">{t('servers.fields.name')}</th>
+                      <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">{t('servers.fields.host')}</th>
+                      <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">{t('servers.operatingSystem')}</th>
+                      <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">{t('servers.environment')}</th>
+                      <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">{t('servers.status')}</th>
+                      <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6"><span className="sr-only">{t('servers.actions')}</span></th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200 bg-white">
@@ -201,11 +203,11 @@ export default function ServerList() {
                 <table className="min-w-full divide-y divide-gray-300">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">Nombre</th>
-                      <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Motor</th>
-                      <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Puerto</th>
-                      <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Estado</th>
-                      <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6"><span className="sr-only">Acciones</span></th>
+                      <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">{t('servers.fields.name')}</th>
+                      <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">{t('servers.fields.engineType')}</th>
+                      <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">{t('servers.fields.port')}</th>
+                      <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">{t('servers.status')}</th>
+                      <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6"><span className="sr-only">{t('servers.actions')}</span></th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200 bg-white">

@@ -1,8 +1,10 @@
 import { useEffect, useState, Fragment } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Dialog, Transition } from '@headlessui/react';
 import { QuestionMarkCircleIcon } from '@heroicons/react/24/outline';
 
 export default function CloseAppModal() {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
@@ -66,11 +68,11 @@ export default function CloseAppModal() {
                   </div>
                   <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
                     <Dialog.Title as="h3" className="text-base font-semibold leading-6 text-gray-900 dark:text-white">
-                      ¿Qué deseas hacer?
+                      {t('closeAppModal.title')}
                     </Dialog.Title>
                     <div className="mt-2">
                       <p className="text-sm text-gray-500 dark:text-gray-400">
-                        Puedes minimizar la aplicación a la bandeja del sistema o cerrarla completamente.
+                        {t('closeAppModal.message')}
                       </p>
                     </div>
                   </div>
@@ -81,21 +83,21 @@ export default function CloseAppModal() {
                     className="inline-flex w-full justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                     onClick={handleMinimize}
                   >
-                    Minimizar a bandeja
+                    {t('closeAppModal.minimize')}
                   </button>
                   <button
                     type="button"
                     className="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
                     onClick={handleClose}
                   >
-                    Cerrar aplicación
+                    {t('closeAppModal.close')}
                   </button>
                   <button
                     type="button"
                     className="inline-flex w-full justify-center rounded-md bg-white dark:bg-gray-700 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-gray-300 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600"
                     onClick={handleCancel}
                   >
-                    Cancelar
+                    {t('closeAppModal.cancel')}
                   </button>
                 </div>
               </Dialog.Panel>

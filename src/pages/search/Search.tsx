@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { MagnifyingGlassIcon, ServerIcon, ExclamationTriangleIcon, CodeBracketIcon, LightBulbIcon } from '@heroicons/react/24/outline';
 import { searchService, SearchResults } from '../../services/search.service';
 
 export default function Search() {
+  const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const query = searchParams.get('q') || '';
   const [results, setResults] = useState<SearchResults | null>(null);
@@ -35,7 +37,7 @@ export default function Search() {
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Búsqueda Global</h1>
+      <h1 className="text-2xl font-bold text-gray-900 mb-6">{t('search.title')}</h1>
 
       <form onSubmit={onSearchSubmit} className="mb-8">
         <div className="relative rounded-md shadow-sm max-w-2xl">
@@ -45,14 +47,14 @@ export default function Search() {
           <input
             type="text"
             className="block w-full rounded-md border-gray-300 pl-10 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border p-3"
-            placeholder="Buscar incidentes, servidores, scripts..."
+            placeholder={t('search.placeholder')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
       </form>
 
-      {loading && <div className="text-gray-500">Buscando...</div>}
+      {loading && <div className="text-gray-500">{t('search.searching')}</div>}
 
       {!loading && results && (
         <div className="space-y-8">

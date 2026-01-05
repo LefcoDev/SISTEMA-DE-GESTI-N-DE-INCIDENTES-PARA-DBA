@@ -31,25 +31,47 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const initAuth = async () => {
       const storedToken = localStorage.getItem('token');
       if (storedToken) {
-        try {
-          // Verify token and get user data
-          const response = await api.get('/auth/me');
-          // The API returns { success: true, data: { user: ... } }
-          if (response.data.data && response.data.data.user) {
-            setUser(response.data.data.user);
-          } else {
-            // Fallback if structure is different
-            setUser(response.data);
-          }
-          setToken(storedToken);
-        } catch (error: any) {
-          // Only log error if it's not a 401 (Unauthorized) which is expected when token expires
-          if (error.response && error.response.status !== 401) {
+        let attempts = 0;
+        const maxAttempts = 10;
+        
+        while (attempts < maxAttempts) {
+          try {
+            // Verify token and get user data
+            const response = await api.get('/auth/me');
+            // The API returns { success: true, data: { user: ... } }
+            if (response.data.data && response.data.data.user) {
+              setUser(response.data.data.user);
+            } else {
+              // Fallback if structure is different
+              setUser(response.data);
+            }
+            setToken(storedToken);
+            break; // Success, exit retry loop
+          } catch (error: any) {
+            attempts++;
+            
+            // If it's a 401, token is invalid, don't retry
+            if (error.response && error.response.status === 401) {
+              localStorage.removeItem('token');
+              setToken(null);
+              setUser(null);
+              break;
+            }
+            
+            // If backend is not ready (network error), retry
+            if (error.code === 'ERR_NETWORK' && attempts < maxAttempts) {
+              console.log(`⏳ Waiting for backend... (attempt ${attempts}/${maxAttempts})`);
+              await new Promise(resolve => setTimeout(resolve, 2000));
+              continue;
+            }
+            
+            // Other errors
             console.error('Auth initialization failed:', error);
+            localStorage.removeItem('token');
+            setToken(null);
+            setUser(null);
+            break;
           }
-          localStorage.removeItem('token');
-          setToken(null);
-          setUser(null);
         }
       }
       setIsLoading(false);

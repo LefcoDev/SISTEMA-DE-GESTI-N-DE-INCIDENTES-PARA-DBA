@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { PlusIcon, FunnelIcon } from '@heroicons/react/24/outline';
 import { Reminder, CreateReminderDTO, ReminderPriority } from '../../features/reminders/types/reminder.types';
 import { remindersService } from '../../features/reminders/services/reminders.service';
@@ -7,6 +8,7 @@ import { ReminderForm } from '../../features/reminders/components/ReminderForm';
 import { useModal } from '../../context/ModalContext';
 
 export const RemindersDashboard: React.FC = () => {
+  const { t } = useTranslation();
   const { showModal } = useModal();
   const [reminders, setReminders] = useState<Reminder[]>([]);
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -95,8 +97,8 @@ export const RemindersDashboard: React.FC = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Reminders</h1>
-          <p className="text-sm text-gray-500">Manage your tasks and deadlines</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('reminders.title')}</h1>
+          <p className="text-sm text-gray-500">{t('reminders.description')}</p>
         </div>
         <button
           onClick={() => {
@@ -106,14 +108,14 @@ export const RemindersDashboard: React.FC = () => {
           className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
         >
           <PlusIcon className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
-          New Reminder
+          {t('reminders.newReminder')}
         </button>
       </div>
 
       <div className="bg-white p-4 rounded-lg shadow flex flex-wrap gap-4 items-center">
         <div className="flex items-center text-gray-500">
           <FunnelIcon className="h-5 w-5 mr-2" />
-          <span className="text-sm font-medium">Filters:</span>
+          <span className="text-sm font-medium">{t('reminders.filters')}:</span>
         </div>
         
         <select
@@ -121,9 +123,9 @@ export const RemindersDashboard: React.FC = () => {
           onChange={(e) => setFilterStatus(e.target.value as any)}
           className="block w-40 rounded-md border-gray-300 py-1.5 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm border p-2"
         >
-          <option value="all">All Status</option>
-          <option value="pending">Pending</option>
-          <option value="completed">Completed</option>
+          <option value="all">{t('reminders.allStatus')}</option>
+          <option value="pending">{t('reminders.pending')}</option>
+          <option value="completed">{t('reminders.completed')}</option>
         </select>
 
         <select
@@ -131,18 +133,18 @@ export const RemindersDashboard: React.FC = () => {
           onChange={(e) => setFilterPriority(e.target.value as any)}
           className="block w-40 rounded-md border-gray-300 py-1.5 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm border p-2"
         >
-          <option value="all">All Priorities</option>
-          <option value="low">Low</option>
-          <option value="medium">Medium</option>
-          <option value="high">High</option>
-          <option value="critical">Critical</option>
+          <option value="all">{t('reminders.allPriorities')}</option>
+          <option value="low">{t('reminders.priority.low')}</option>
+          <option value="medium">{t('reminders.priority.medium')}</option>
+          <option value="high">{t('reminders.priority.high')}</option>
+          <option value="critical">{t('reminders.priority.critical')}</option>
         </select>
       </div>
 
       <div className="space-y-4">
         {filteredReminders.length === 0 ? (
           <div className="text-center py-12 bg-white rounded-lg border-2 border-dashed border-gray-300">
-            <p className="text-gray-500">No reminders found matching your filters.</p>
+            <p className="text-gray-500">{t('reminders.noResults')}</p>
           </div>
         ) : (
           filteredReminders.map(reminder => (

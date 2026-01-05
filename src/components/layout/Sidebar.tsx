@@ -1,5 +1,6 @@
 import { Fragment } from 'react';
 import { NavLink } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Dialog, Transition } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import clsx from 'clsx';
@@ -12,6 +13,7 @@ interface SidebarProps {
 }
 
 export default function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { menuItems, getIconComponent } = useMenu();
 
@@ -95,7 +97,7 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
                                 }
                               >
                                 <item.icon className="h-6 w-6 shrink-0" aria-hidden="true" />
-                                {item.name}
+                                {t(`nav.${item.id}`)}
                               </NavLink>
                             </li>
                           ))}
@@ -139,7 +141,7 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
                         }
                       >
                         <item.icon className="h-6 w-6 shrink-0" aria-hidden="true" />
-                        {item.name}
+                        {t(`nav.${item.id}`)}
                       </NavLink>
                     </li>
                   ))}

@@ -26,6 +26,7 @@ import NotesDashboard from './pages/notes/NotesDashboard';
 import { RemindersDashboard } from './pages/reminders/RemindersDashboard';
 import { KnowledgeDashboard } from './pages/knowledge/KnowledgeDashboard';
 import { JournalDashboard } from './pages/journal/JournalDashboard';
+import Chat from './pages/chat/Chat';
 
 function App() {
   return (
@@ -66,6 +67,7 @@ function App() {
               <Route path="solutions/:id/edit" element={<SolutionForm />} />
               <Route path="scripts" element={<ScriptList />} />
               <Route path="reports" element={<Reports />} />
+              <Route path="chat" element={<Chat />} />
               <Route path="settings" element={<Settings />} /> 
             </Route>
           </Routes>

@@ -19,6 +19,7 @@ import journalRoutes from './journal.routes';
 import topicsRoutes from './topics.routes';
 import resourcesRoutes from './resources.routes';
 import notificationsRoutes from './notifications.routes';
+import chatRoutes from './chat.routes';
 
 const router = Router();
 
@@ -42,5 +43,6 @@ router.use('/journal', journalRoutes);
 router.use('/topics', topicsRoutes);
 router.use('/resources', resourcesRoutes);
 router.use('/notifications', notificationsRoutes);
+router.use('/chat', chatRoutes);
 
 export default router;

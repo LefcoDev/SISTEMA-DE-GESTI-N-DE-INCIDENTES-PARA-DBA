@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   CheckCircleIcon, ExclamationTriangleIcon, ServerIcon, CircleStackIcon
 } from '@heroicons/react/24/outline';
 import { dashboardService, DashboardStats } from '../../services/dashboard.service';
 
 export default function Dashboard() {
+  const { t } = useTranslation();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [monitoringData, setMonitoringData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -27,12 +29,12 @@ export default function Dashboard() {
     fetchData();
   }, []);
 
-  if (loading) return <div className="p-6">Cargando dashboard...</div>;
+  if (loading) return <div className="p-6">{t('common.loading')}</div>;
 
   return (
     <div className="p-6 space-y-6">
       <div className="flex items-center gap-3">
-        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+        <h1 className="text-2xl font-bold text-gray-900">{t('dashboard.title')}</h1>
         <span className="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">v1.0.19</span>
       </div>
 
@@ -46,7 +48,7 @@ export default function Dashboard() {
               </div>
               <div className="ml-5 w-0 flex-1">
                 <dl>
-                  <dt className="text-sm font-medium text-gray-500 truncate">Incidentes Activos</dt>
+                  <dt className="text-sm font-medium text-gray-500 truncate">{t('dashboard.activeIncidents')}</dt>
                   <dd className="text-lg font-medium text-gray-900">{stats?.activeIncidents}</dd>
                 </dl>
               </div>
@@ -62,7 +64,7 @@ export default function Dashboard() {
               </div>
               <div className="ml-5 w-0 flex-1">
                 <dl>
-                  <dt className="text-sm font-medium text-gray-500 truncate">Resueltos (Mes)</dt>
+                  <dt className="text-sm font-medium text-gray-500 truncate">{t('dashboard.resolvedThisMonth')}</dt>
                   <dd className="text-lg font-medium text-gray-900">{stats?.resolvedThisMonth}</dd>
                 </dl>
               </div>
@@ -78,7 +80,7 @@ export default function Dashboard() {
               </div>
               <div className="ml-5 w-0 flex-1">
                 <dl>
-                  <dt className="text-sm font-medium text-gray-500 truncate">Servidores Monitoreados</dt>
+                  <dt className="text-sm font-medium text-gray-500 truncate">{t('dashboard.monitoredServers')}</dt>
                   <dd className="text-lg font-medium text-gray-900">{monitoringData?.stats?.total || 0}</dd>
                 </dl>
               </div>
@@ -94,7 +96,7 @@ export default function Dashboard() {
               </div>
               <div className="ml-5 w-0 flex-1">
                 <dl>
-                  <dt className="text-sm font-medium text-gray-500 truncate">Servidores Online</dt>
+                  <dt className="text-sm font-medium text-gray-500 truncate">{t('dashboard.serversOnline')}</dt>
                   <dd className="text-lg font-medium text-gray-900">{monitoringData?.stats?.online || 0}</dd>
                 </dl>
               </div>
@@ -105,16 +107,16 @@ export default function Dashboard() {
 
       {/* Server Status Table */}
       <div className="bg-white shadow rounded-lg p-6">
-        <h2 className="text-lg font-medium text-gray-900 mb-4">Estado de Servidores y Base de Datos</h2>
+        <h2 className="text-lg font-medium text-gray-900 mb-4">{t('dashboard.serverStatusTitle')}</h2>
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-300">
             <thead>
               <tr>
-                <th className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900">Servidor</th>
-                <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Host / IP</th>
-                <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Motor BD</th>
-                <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Estado Servidor (Ping)</th>
-                <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Estado BD (Puerto)</th>
+                <th className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900">{t('dashboard.serverName')}</th>
+                <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">{t('dashboard.hostIP')}</th>
+                <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">{t('dashboard.dbEngine')}</th>
+                <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">{t('dashboard.serverStatusPing')}</th>
+                <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">{t('dashboard.dbStatus')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
@@ -130,7 +132,7 @@ export default function Dashboard() {
                         ? 'bg-green-50 text-green-700 ring-green-600/20'
                         : 'bg-red-50 text-red-700 ring-red-600/20'
                         }`}>
-                        {lastCheck?.server_reachable ? 'Online' : 'Offline'}
+                        {lastCheck?.server_reachable ? t('dashboard.online') : t('dashboard.offline')}
                       </span>
                     </td>
                     <td className="whitespace-nowrap px-3 py-4 text-sm">
@@ -138,7 +140,7 @@ export default function Dashboard() {
                         ? 'bg-green-50 text-green-700 ring-green-600/20'
                         : 'bg-red-50 text-red-700 ring-red-600/20'
                         }`}>
-                        {lastCheck?.is_online ? 'Online' : 'Offline'}
+                        {lastCheck?.is_online ? t('dashboard.online') : t('dashboard.offline')}
                       </span>
                     </td>
                   </tr>
@@ -147,7 +149,7 @@ export default function Dashboard() {
               {(!monitoringData?.servers || monitoringData.servers.length === 0) && (
                 <tr>
                   <td colSpan={5} className="py-4 text-center text-sm text-gray-500">
-                    No hay servidores registrados
+                    {t('dashboard.noServers')}
                   </td>
                 </tr>
               )}

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { PlusIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import { notesService } from '../../features/notes/services/notes.service';
 import { Note, CreateNoteDTO, NoteFilters } from '../../features/notes/types/note.types';
@@ -7,6 +8,7 @@ import NoteForm from '../../features/notes/components/NoteForm';
 import { useModal } from '../../context/ModalContext';
 
 export default function NotesDashboard() {
+  const { t } = useTranslation();
   const [notes, setNotes] = useState<Note[]>([]);
   const [loading, setLoading] = useState(true);
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -93,9 +95,9 @@ export default function NotesDashboard() {
     <div className="px-4 sm:px-6 lg:px-8 py-8">
       <div className="sm:flex sm:items-center">
         <div className="sm:flex-auto">
-          <h1 className="text-2xl font-semibold text-gray-900">My Notes</h1>
+          <h1 className="text-2xl font-semibold text-gray-900">{t('notes.title')}</h1>
           <p className="mt-2 text-sm text-gray-700">
-            Manage your sticky notes, ideas, and reminders.
+            {t('notes.description')}
           </p>
         </div>
         <div className="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
@@ -105,7 +107,7 @@ export default function NotesDashboard() {
             className="block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             <PlusIcon className="h-5 w-5 inline-block mr-1" />
-            New Note
+            {t('notes.newNote')}
           </button>
         </div>
       </div>
@@ -119,14 +121,14 @@ export default function NotesDashboard() {
           <input
             type="text"
             className="block w-full rounded-md border-0 py-1.5 pl-10 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-            placeholder="Search notes..."
+            placeholder={t('notes.searchPlaceholder')}
             value={filters.search || ''}
             onChange={(e) => setFilters({ ...filters, search: e.target.value })}
           />
         </div>
         
         <div className="flex items-center space-x-2">
-          <label className="text-sm text-gray-700">Show Archived:</label>
+          <label className="text-sm text-gray-700">{t('notes.showArchived')}:</label>
           <input
             type="checkbox"
             checked={filters.is_archived}

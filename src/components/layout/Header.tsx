@@ -1,4 +1,5 @@
 import { Fragment, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Menu, Transition } from '@headlessui/react';
 import { Bars3Icon, ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import clsx from 'clsx';
@@ -11,6 +12,7 @@ interface HeaderProps {
 }
 
 export default function Header({ setSidebarOpen }: HeaderProps) {
+  const { t } = useTranslation();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
@@ -69,7 +71,7 @@ export default function Header({ setSidebarOpen }: HeaderProps) {
           <input
             id="search-field"
             className="block h-full w-full border-0 py-0 pl-8 pr-0 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm"
-            placeholder="Buscar incidentes, servidores, scripts..."
+            placeholder={t('common.search')}
             type="search"
             name="search"
             value={searchQuery}
@@ -120,7 +122,7 @@ export default function Header({ setSidebarOpen }: HeaderProps) {
                         'block px-3 py-1 text-sm leading-6 text-gray-900'
                       )}
                     >
-                      Perfil
+                      {t('settings.tabs.profile')}
                     </Link>
                   )}
                 </Menu.Item>
@@ -133,7 +135,7 @@ export default function Header({ setSidebarOpen }: HeaderProps) {
                         'block w-full text-left px-3 py-1 text-sm leading-6 text-gray-900'
                       )}
                     >
-                      Cerrar Sesión
+                      {t('nav.logout')}
                     </button>
                   )}
                 </Menu.Item>

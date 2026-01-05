@@ -1,21 +1,29 @@
 import { useState } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Header from './Header';
 
 export default function MainLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const location = useLocation();
+  const isChat = location.pathname === '/chat';
 
   return (
-    <div>
+    <div className="h-screen overflow-hidden">
       <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
-      <div className="lg:pl-72">
+      <div className={`lg:pl-72 h-full flex flex-col ${isChat ? '' : 'overflow-auto'}`}>
         <Header setSidebarOpen={setSidebarOpen} />
-        <main className="py-10">
-          <div className="px-4 sm:px-6 lg:px-8">
+        {isChat ? (
+          <div className="flex-1 overflow-hidden">
             <Outlet />
           </div>
-        </main>
+        ) : (
+          <main className="py-10 flex-1">
+            <div className="px-4 sm:px-6 lg:px-8">
+              <Outlet />
+            </div>
+          </main>
+        )}
       </div>
     </div>
   );

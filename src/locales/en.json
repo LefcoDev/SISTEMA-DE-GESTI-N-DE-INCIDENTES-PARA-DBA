@@ -1,0 +1,521 @@
+{
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close",
+    "search": "Search",
+    "filter": "Filter",
+    "loading": "Loading...",
+    "noData": "No data available",
+    "actions": "Actions",
+    "status": "Status",
+    "date": "Date",
+    "type": "Type",
+    "description": "Description",
+    "confirm": "Confirm",
+    "error": "Error",
+    "success": "Success"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "incidents": "Incidents",
+    "servers": "Servers",
+    "monitoring": "Monitoring",
+    "scripts": "Scripts",
+    "solutions": "Solutions",
+    "tags": "Tags",
+    "users": "Users",
+    "audit": "Audit",
+    "settings": "Settings",
+    "logout": "Logout",
+    "notes": "Notes",
+    "reminders": "Reminders",
+    "knowledge": "Knowledge",
+    "reports": "Reports",
+    "search": "Search"
+  },
+  "auth": {
+    "login": "Sign In",
+    "username": "Username",
+    "password": "Password",
+    "rememberMe": "Remember me",
+    "forgotPassword": "Forgot your password?",
+    "loginError": "Invalid username or password",
+    "welcomeBack": "Welcome back",
+    "signInToContinue": "Sign in to continue"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "activeIncidents": "Active Incidents",
+    "resolvedThisMonth": "Resolved (Month)",
+    "monitoredServers": "Monitored Servers",
+    "serversOnline": "Servers Online",
+    "serverStatusTitle": "Server and Database Status",
+    "serverName": "Server",
+    "hostIP": "Host / IP",
+    "dbEngine": "DB Engine",
+    "serverStatusPing": "Server Status (Ping)",
+    "dbStatus": "DB Status (Port)",
+    "online": "Online",
+    "offline": "Offline",
+    "noServers": "No registered servers"
+  },
+  "incidents": {
+    "title": "Incidents",
+    "newIncident": "New Incident",
+    "editIncident": "Edit Incident",
+    "incidentDetails": "Incident Details",
+    "description": "List of incidents registered in database servers.",
+    "errorLoading": "Error loading incidents",
+    "errorDeleting": "Error deleting incident",
+    "confirmDelete": "Are you sure you want to delete this incident?",
+    "fields": {
+      "title": "Title",
+      "description": "Description",
+      "severity": "Severity",
+      "priority": "Priority",
+      "status": "Status",
+      "server": "Server",
+      "assignedTo": "Assigned to",
+      "createdBy": "Created by",
+      "createdAt": "Created at",
+      "updatedAt": "Last updated",
+      "resolvedAt": "Resolved at"
+    },
+    "severity": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High",
+      "critical": "Critical"
+    },
+    "status": {
+      "new": "New",
+      "open": "Open",
+      "in_progress": "In Progress",
+      "resolved": "Resolved",
+      "closed": "Closed"
+    },
+    "priority": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High",
+      "urgent": "Urgent"
+    }
+  },
+  "servers": {
+    "title": "Servers",
+    "newServer": "New Server",
+    "editServer": "Edit Server",
+    "serverDetails": "Server Details",
+    "description": "List of all database servers registered in the system.",
+    "errorLoading": "Error loading servers",
+    "errorDeleting": "Error deleting server",
+    "confirmDelete": "Are you sure you want to delete this server?",
+    "database": "Database",
+    "operatingSystem": "Operating System",
+    "environment": "Environment",
+    "status": "Status",
+    "actions": "Actions",
+    "fields": {
+      "name": "Name",
+      "host": "Host",
+      "port": "Port",
+      "engineType": "Database Engine",
+      "username": "Username",
+      "password": "Password",
+      "database": "Database",
+      "description": "Description",
+      "isActive": "Active"
+    },
+    "engineTypes": {
+      "mysql": "MySQL",
+      "postgresql": "PostgreSQL",
+      "oracle": "Oracle",
+      "sqlserver": "SQL Server",
+      "mongodb": "MongoDB"
+    }
+  },
+  "monitoring": {
+    "title": "Monitoring",
+    "description": "Real-time server and database monitoring dashboard.",
+    "healthCheck": "Health Check",
+    "lastCheck": "Last Check",
+    "responseTime": "Response Time",
+    "uptime": "Uptime",
+    "alertsActive": "Active Alerts",
+    "performanceMetrics": "Performance Metrics",
+    "runHealthCheck": "Run Health Check",
+    "serverHealth": "Server Health",
+    "healthy": "Healthy",
+    "unhealthy": "Unhealthy",
+    "totalServers": "Total Servers",
+    "online": "Online",
+    "offline": "Offline",
+    "avgResponseTime": "Avg Response Time"
+  },
+  "scripts": {
+    "title": "Scripts",
+    "newScript": "New Script",
+    "editScript": "Edit Script",
+    "runScript": "Run Script",
+    "description": "Repository of SQL scripts and database administration commands.",
+    "errorLoading": "Error loading scripts",
+    "errorDeleting": "Error deleting script",
+    "confirmDelete": "Are you sure you want to delete this script?",
+    "executeScript": "Execute",    "libraryTitle": "Script Library",
+    "loading": "Loading scripts...",
+    "usage": "Usage",    "fields": {
+      "name": "Name",
+      "description": "Description",
+      "content": "Content",
+      "language": "Language",
+      "category": "Category"
+    }
+  },
+  "solutions": {
+    "title": "Solutions",
+    "newSolution": "New Solution",
+    "editSolution": "Edit Solution",
+    "description": "Record of solutions applied to incidents and knowledge base.",
+    "errorLoading": "Error loading solutions",
+    "errorDeleting": "Error deleting solution",
+    "confirmDelete": "Are you sure you want to delete this solution?",
+    "loading": "Loading solutions...",
+    "searchPlaceholder": "Search solutions...",
+    "all": "All",
+    "solutionsFilter": "Solutions",
+    "templates": "Templates",
+    "fields": {
+      "title": "Title",
+      "description": "Description",
+      "steps": "Steps",
+      "incident": "Incident",
+      "type": "Type",
+      "appliedBy": "Applied by",
+      "date": "Date"
+    }
+  },
+  "tags": {
+    "title": "Tags",
+    "newTag": "New Tag",
+    "editTag": "Edit Tag",
+    "fields": {
+      "name": "Name",
+      "color": "Color"
+    }
+  },
+  "users": {
+    "title": "Users",
+    "newUser": "New User",
+    "editUser": "Edit User",
+    "fields": {
+      "username": "Username",
+      "email": "Email",
+      "name": "Name",
+      "role": "Role",
+      "isActive": "Active",
+      "password": "Password",
+      "confirmPassword": "Confirm Password"
+    },
+    "roles": {
+      "admin": "Administrator",
+      "user": "User",
+      "viewer": "Viewer"
+    }
+  },
+  "audit": {
+    "title": "Audit",
+    "description": "Record of activities and changes in the system.",
+    "logs": "Audit Logs",
+    "searchPlaceholder": "Search by user, entity or action...",
+    "allEntities": "All Entities",
+    "allActions": "All Actions",
+    "loading": "Loading records...",
+    "noRecords": "No records found",
+    "viewDetails": "View details",
+    "detailsTitle": "Audit Record Details",
+    "deleteConfirm": "Are you sure you want to delete this audit record? This action cannot be undone.",
+    "fields": {
+      "date": "Date",
+      "user": "User",
+      "action": "Action",
+      "entity": "Entity",
+      "changes": "Changes",
+      "ip": "IP",
+      "actions": "Actions",
+      "timestamp": "Timestamp",
+      "details": "Details",
+      "ipAddress": "IP Address",
+      "oldValue": "Old Value",
+      "newValue": "New Value",
+      "data": "Data"
+    },
+    "entities": {
+      "USER": "Users",
+      "SERVER": "Servers",
+      "INCIDENT": "Incidents",
+      "SOLUTION": "Solutions",
+      "SCRIPT": "Scripts",
+      "AUTH": "Authentication"
+    },
+    "actions": {
+      "CREATE": "Creation",
+      "UPDATE": "Update",
+      "DELETE": "Deletion",
+      "LOGIN": "Login",
+      "REGISTER": "Register"
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "tabs": {
+      "profile": "Profile",
+      "password": "Password",
+      "notifications": "Notifications",
+      "language": "Language"
+    },
+    "profile": {
+      "title": "User Profile",
+      "editProfile": "Edit Profile",
+      "cancel": "Cancel",
+      "avatar": "Profile Picture",
+      "changeAvatar": "Change Picture",
+      "removeAvatar": "Remove Picture",
+      "saveChanges": "Save Changes",
+      "logout": "Logout"
+    },
+    "password": {
+      "title": "Change Password",
+      "description": "Update your password to keep your account secure",
+      "currentPassword": "Current Password",
+      "newPassword": "New Password",
+      "confirmPassword": "Confirm Password",
+      "updatePassword": "Update Password"
+    },
+    "users": {
+      "title": "User Management",
+      "newUser": "New User",
+      "loading": "Loading users...",
+      "editUser": "Edit User",
+      "createUser": "Create New User",
+      "fullName": "Full Name",
+      "username": "Username",
+      "email": "Email",
+      "role": "Role",
+      "password": "Password",
+      "active": "Active",
+      "actions": "Actions"
+    },
+    "tags": {
+      "title": "Tag Management",
+      "tagName": "Tag Name",
+      "color": "Color",
+      "createTag": "Create Tag",
+      "loading": "Loading tags...",
+      "name": "Name",
+      "usage": "Usage",
+      "actions": "Actions"
+    },
+    "backups": {
+      "title": "Backups",
+      "createBackup": "Create Manual Backup",
+      "creating": "Creating...",
+      "loading": "Loading backups...",
+      "warning": "Backups include the entire database (users, servers, incidents, etc.). When restoring, all current data will be replaced.",
+      "file": "File",
+      "date": "Date",
+      "size": "Size",
+      "actions": "Actions",
+      "restore": "Restore",
+      "delete": "Delete",
+      "noBackups": "No backups available"
+    },
+    "menu": {
+      "title": "Menu Customization",
+      "description": "Drag items to reorder the sidebar menu. Disable items you don't need.",
+      "required": "Required",
+      "resetToDefault": "Reset to default"
+    },
+    "appearance": {
+      "darkMode": "Dark Mode",
+      "darkModeDesc": "Enable dark mode for the interface"
+    },
+    "notifications": {
+      "title": "Notification Preferences",
+      "emailNotifications": "Email Notifications",
+      "desktopNotifications": "Desktop Notifications",
+      "incidentAlerts": "Incident Alerts",
+      "monitoringAlerts": "Monitoring Alerts"
+    },
+    "language": {
+      "title": "Language",
+      "selectLanguage": "Select Language",
+      "spanish": "Spanish",
+      "english": "English"
+    }
+  },
+  "closeAppModal": {
+    "title": "Close application?",
+    "message": "What would you like to do?",
+    "minimize": "Minimize to tray",
+    "close": "Close application",
+    "cancel": "Cancel"
+  },
+  "notes": {
+    "title": "My Notes",
+    "newNote": "New Note",
+    "editNote": "Edit Note",
+    "description": "Manage your sticky notes, ideas, and reminders.",
+    "allNotes": "All Notes",
+    "pinned": "Pinned",
+    "recent": "Recent",
+    "searchPlaceholder": "Search notes...",
+    "showArchived": "Show Archived"
+  },
+  "reminders": {
+    "title": "Reminders",
+    "newReminder": "New Reminder",
+    "editReminder": "Edit Reminder",
+    "description": "Manage your tasks and deadlines.",
+    "upcoming": "Upcoming",
+    "overdue": "Overdue",
+    "completed": "Completed",
+    "pending": "Pending",
+    "filters": "Filters",
+    "allStatus": "All Status",
+    "allPriorities": "All Priorities",
+    "noResults": "No reminders found matching your filters.",
+    "priority": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High",
+      "critical": "Critical"
+    }
+  },
+  "knowledge": {
+    "title": "Knowledge Base",
+    "newEntry": "New Nugget",
+    "editEntry": "Edit Entry",
+    "description": "Capture and share knowledge nuggets.",
+    "categories": "Categories",
+    "recentEntries": "Recent Entries",
+    "filters": "Filters",
+    "allCategories": "All Categories",
+    "allLevels": "All Levels",
+    "searchPlaceholder": "Search nuggets or tags...",
+    "category": {
+      "til": "Today I Learned",
+      "bestPractice": "Best Practice",
+      "gotcha": "Gotcha",
+      "quickTip": "Quick Tip",
+      "commandRef": "Command Ref",
+      "troubleshooting": "Troubleshooting"
+    },
+    "complexity": {
+      "beginner": "Beginner",
+      "intermediate": "Intermediate",
+      "advanced": "Advanced",
+      "expert": "Expert"
+    }
+  },
+  "reports": {
+    "title": "Reports and Analysis",
+    "description": "Generate detailed reports and analyze incident trends.",
+    "generate": "Generate Report",
+    "export": "Export",
+    "dateRange": "Date Range",
+    "incidentReport": "Incident Report",
+    "serverReport": "Server Report",
+    "generalReport": "General Report",
+    "trendsAnalysis": "Trends Analysis",
+    "updateAnalysis": "Update Analysis",
+    "exportExcel": "Export to Excel",
+    "filters": {
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "server": "Server",
+      "type": "Type",
+      "severity": "Severity",
+      "status": "Status",
+      "all": "All",
+      "allSeverities": "All",
+      "allStatuses": "All"
+    },
+    "stats": {
+      "total": "Total Incidents",
+      "bySeverity": "By Severity",
+      "byStatus": "By Status",
+      "byType": "By Type",
+      "mttr": "MTTR (Mean Time To Resolution)",
+      "totalIncidents": "Total Incidents",
+      "critical": "Critical",
+      "resolved": "Resolved",
+      "reportSummary": "Report Summary",
+      "incidents": "Incidents"
+    },
+    "trends": {
+      "comparison": "Period Comparison",
+      "currentPeriod": "Current Period",
+      "previousPeriod": "Previous Period",
+      "topServers": "Top Problematic Servers"
+    },
+    "errors": {
+      "generateReport": "Error generating report",
+      "exportExcel": "Error generating Excel report",
+      "fetchTrends": "Error fetching trends analysis",
+      "generate": "Error generating report"
+    }
+  },
+  "search": {
+    "title": "Global Search",
+    "description": "Search across incidents, servers, scripts and solutions.",
+    "placeholder": "Search incidents, servers, scripts...",
+    "results": "Results",
+    "noResults": "No results found",
+    "searchIn": "Search in",
+    "searching": "Searching..."
+  },
+  "chat": {
+    "title": "Chat",
+    "newChat": "New Chat",
+    "directChat": "Direct Chat",
+    "groupChat": "Group Chat",
+    "globalChat": "Global Chat",
+    "noConversations": "No conversations",
+    "noMessages": "No messages",
+    "selectConversation": "Select a conversation",
+    "selectConversationDesc": "Choose a chat from the list or select a user",
+    "typeMessage": "Type a message...",
+    "send": "Send",
+    "participants": "participants",
+    "yesterday": "Yesterday",
+    "createGroup": "Create Group",
+    "startDirectChat": "Start Direct Chat",
+    "groupName": "Group Name",
+    "selectUsers": "Select Users",
+    "users": "Users",
+    "searchUsers": "Search users...",
+    "noUsers": "No users available",
+    "noUsersFound": "No users found",
+    "online": "Online",
+    "offline": "Offline"
+  },
+  "validation": {
+    "required": "This field is required",
+    "email": "Invalid email address",
+    "minLength": "Must be at least {{min}} characters",
+    "maxLength": "Cannot exceed {{max}} characters",
+    "passwordMatch": "Passwords do not match",
+    "invalidFormat": "Invalid format"
+  },
+  "messages": {
+    "saveSuccess": "Saved successfully",
+    "deleteSuccess": "Deleted successfully",
+    "updateSuccess": "Updated successfully",
+    "createSuccess": "Created successfully",
+    "operationFailed": "Operation failed",
+    "confirmDelete": "Are you sure you want to delete this?"
+  }
+}

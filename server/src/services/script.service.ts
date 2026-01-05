@@ -11,10 +11,14 @@ export class ScriptService {
     const script = await Script.create(scriptData);
 
     if (tags && Array.isArray(tags)) {
-      const tagInstances = await Promise.all(
-        tags.map(tagName => Tag.findOrCreate({ where: { name: tagName } }))
-      );
-      await script.setTags(tagInstances.map(t => t[0]));
+      // tags ahora es array de IDs, no nombres
+      const tagInstances = await Tag.findAll({ where: { id: tags } });
+      await script.setTags(tagInstances);
+      
+      // Increment usage count for each tag
+      for (const tag of tagInstances) {
+        await tag.increment('usage_count');
+      }
     }
 
     return this.findById(script.id);
@@ -53,10 +57,28 @@ export class ScriptService {
     await script.update(scriptData);
 
     if (tags && Array.isArray(tags)) {
-      const tagInstances = await Promise.all(
-        tags.map(tagName => Tag.findOrCreate({ where: { name: tagName } }))
-      );
-      await script.setTags(tagInstances.map(t => t[0]));
+      // Get current tags to decrement usage
+      const currentTags = await script.getTags();
+      
+      // tags ahora es array de IDs, no nombres
+      const newTagInstances = await Tag.findAll({ where: { id: tags } });
+      await script.setTags(newTagInstances);
+      
+      // Decrement usage count for removed tags
+      for (const oldTag of currentTags) {
+        if (!newTagInstances.find((t: Tag) => t.id === oldTag.id)) {
+          if (oldTag.usage_count > 0) {
+            await oldTag.decrement('usage_count');
+          }
+        }
+      }
+      
+      // Increment usage count for new tags
+      for (const newTag of newTagInstances) {
+        if (!currentTags.find((t: Tag) => t.id === newTag.id)) {
+          await newTag.increment('usage_count');
+        }
+      }
     }
 
     return this.findById(id);
@@ -65,6 +87,15 @@ export class ScriptService {
   async delete(id: number) {
     const script = await this.findById(id);
     if (!script) return null;
+    
+    // Decrement usage count for all tags before deleting
+    const tags = await script.getTags();
+    for (const tag of tags) {
+      if (tag.usage_count > 0) {
+        await tag.decrement('usage_count');
+      }
+    }
+    
     await script.destroy();
     return true;
   }

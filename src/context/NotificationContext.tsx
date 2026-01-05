@@ -54,8 +54,11 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         // Mark as sent after showing (optional, depending on backend logic)
         // await api.patch(`/notifications/${notification.id}/read`); 
       }
-    } catch (error) {
-      console.error('Error fetching notifications:', error);
+    } catch (error: any) {
+      // Silently ignore network errors during backend startup
+      if (error.code !== 'ERR_NETWORK') {
+        console.error('Error fetching notifications:', error);
+      }
     } finally {
       setLoading(false);
     }

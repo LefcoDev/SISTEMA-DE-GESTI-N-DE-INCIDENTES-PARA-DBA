@@ -1,10 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { useModal } from '../../context/ModalContext';
 import { useMenu, MenuItem } from '../../context/MenuContext';
-import { UserCircleIcon, ShieldCheckIcon, ComputerDesktopIcon, TagIcon, ArchiveBoxIcon, TrashIcon, ArrowPathIcon, CameraIcon, CheckCircleIcon, XCircleIcon, UsersIcon, PlusIcon, PencilSquareIcon, Bars3Icon, ChevronUpIcon, ChevronDownIcon, KeyIcon } from '@heroicons/react/24/outline';
+import { UserCircleIcon, ShieldCheckIcon, ComputerDesktopIcon, TagIcon, ArchiveBoxIcon, TrashIcon, ArrowPathIcon, CameraIcon, CheckCircleIcon, XCircleIcon, UsersIcon, PlusIcon, PencilSquareIcon, Bars3Icon, ChevronUpIcon, ChevronDownIcon, KeyIcon, GlobeAltIcon } from '@heroicons/react/24/outline';
 import PasswordInput from '../../components/PasswordInput';
+import LanguageSelector from '../../components/LanguageSelector';
 import { tagService, Tag } from '../../services/tag.service';
 import { backupService, Backup } from '../../services/backup.service';
 import { userService, User as UserType } from '../../services/user.service';
@@ -29,7 +31,7 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
-function SortableMenuItem({ item, toggleVisibility }: { item: MenuItem; toggleVisibility: (id: string) => void }) {
+function SortableMenuItem({ item, toggleVisibility, t }: { item: MenuItem; toggleVisibility: (id: string) => void; t: any }) {
   const {
     attributes,
     listeners,
@@ -61,7 +63,7 @@ function SortableMenuItem({ item, toggleVisibility }: { item: MenuItem; toggleVi
           <Bars3Icon className="h-5 w-5" />
         </div>
         <span className="text-sm font-medium text-gray-900 dark:text-white">{item.name}</span>
-        {item.required && <span className="text-xs text-gray-400 italic">(Requerido)</span>}
+        {item.required && <span className="text-xs text-gray-400 italic">({t('settings.menu.required')})</span>}
       </div>
       
       <button
@@ -85,6 +87,7 @@ function SortableMenuItem({ item, toggleVisibility }: { item: MenuItem; toggleVi
 }
 
 export default function Settings() {
+  const { t } = useTranslation();
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const { showModal } = useModal();
@@ -509,17 +512,18 @@ export default function Settings() {
   };
 
   const tabs = [
-    { id: 'profile', name: 'Perfil', icon: UserCircleIcon },
-    { id: 'password', name: 'Contraseña', icon: KeyIcon },
-    ...(user?.role === 'admin' ? [{ id: 'users', name: 'Usuarios', icon: UsersIcon }] : []),
-    { id: 'tags', name: 'Tags', icon: TagIcon },
+    { id: 'profile', name: t('settings.tabs.profile'), icon: UserCircleIcon },
+    { id: 'password', name: t('settings.tabs.password'), icon: KeyIcon },
+    ...(user?.role === 'admin' ? [{ id: 'users', name: t('users.title'), icon: UsersIcon }] : []),
+    { id: 'tags', name: t('tags.title'), icon: TagIcon },
     { id: 'backups', name: 'Backups', icon: ArchiveBoxIcon },
-    { id: 'app', name: 'Aplicación', icon: ComputerDesktopIcon },
+    { id: 'language', name: t('settings.tabs.language'), icon: GlobeAltIcon },
+    { id: 'app', name: t('nav.settings'), icon: ComputerDesktopIcon },
   ];
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Configuración</h1>
+      <h1 className="text-2xl font-bold text-gray-900 mb-6">{t('settings.title')}</h1>
 
       <div className="flex flex-col lg:flex-row gap-6">
         {/* Sidebar Navigation */}
@@ -550,12 +554,12 @@ export default function Settings() {
           {activeTab === 'profile' && (
             <div className="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
               <div className="px-4 py-5 sm:px-6 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
-                <h3 className="text-lg font-medium leading-6 text-gray-900 dark:text-white">Perfil de Usuario</h3>
+                <h3 className="text-lg font-medium leading-6 text-gray-900 dark:text-white">{t('settings.profile.title')}</h3>
                 <button
                   onClick={() => setIsEditing(!isEditing)}
                   className="text-sm text-indigo-600 hover:text-indigo-500 dark:text-indigo-400"
                 >
-                  {isEditing ? 'Cancelar' : 'Editar Perfil'}
+                  {isEditing ? t('settings.profile.cancel') : t('settings.profile.editProfile')}
                 </button>
               </div>
               <div className="px-4 py-5 sm:p-6">
@@ -634,7 +638,7 @@ export default function Settings() {
                         type="submit"
                         className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                       >
-                        Guardar Cambios
+                        {t('settings.profile.saveChanges')}
                       </button>
                     </div>
                   )}
@@ -645,7 +649,7 @@ export default function Settings() {
                     onClick={logout}
                     className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
                   >
-                    Cerrar Sesión
+                    {t('settings.profile.logout')}
                   </button>
                 </div>
               </div>
@@ -656,8 +660,8 @@ export default function Settings() {
           {activeTab === 'password' && (
             <div className="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
               <div className="px-4 py-5 sm:px-6 border-b border-gray-200 dark:border-gray-700">
-                <h3 className="text-lg font-medium leading-6 text-gray-900 dark:text-white">Cambiar Contraseña</h3>
-                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Actualiza tu contraseña para mantener tu cuenta segura</p>
+                <h3 className="text-lg font-medium leading-6 text-gray-900 dark:text-white">{t('settings.password.title')}</h3>
+                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{t('settings.password.description')}</p>
               </div>
               <div className="px-4 py-5 sm:p-6">
                 <form onSubmit={handleChangePassword} className="max-w-md">
@@ -731,18 +735,18 @@ export default function Settings() {
           {activeTab === 'users' && (
             <div className="bg-white shadow rounded-lg overflow-hidden">
               <div className="px-4 py-5 sm:px-6 border-b border-gray-200 flex justify-between items-center">
-                <h3 className="text-lg font-medium leading-6 text-gray-900">Gestión de Usuarios</h3>
+                <h3 className="text-lg font-medium leading-6 text-gray-900">{t('settings.users.title')}</h3>
                 <button
                   onClick={() => handleOpenUserModal()}
                   className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                 >
                   <PlusIcon className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
-                  Nuevo Usuario
+                  {t('settings.users.newUser')}
                 </button>
               </div>
               <div className="px-4 py-5 sm:p-6">
                 {loadingUsers ? (
-                  <div className="text-center py-4">Cargando usuarios...</div>
+                  <div className="text-center py-4">{t('settings.users.loading')}</div>
                 ) : (
                   <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
                     <table className="min-w-full divide-y divide-gray-300">
@@ -823,13 +827,13 @@ export default function Settings() {
           {activeTab === 'tags' && (
             <div className="bg-white shadow rounded-lg overflow-hidden">
               <div className="px-4 py-5 sm:px-6 border-b border-gray-200 flex justify-between items-center">
-                <h3 className="text-lg font-medium leading-6 text-gray-900">Gestión de Tags</h3>
+                <h3 className="text-lg font-medium leading-6 text-gray-900">{t('settings.tags.title')}</h3>
               </div>
               <div className="px-4 py-5 sm:p-6">
                 {/* Create Tag Form */}
                 <form onSubmit={handleCreateTag} className="mb-8 flex gap-4 items-end">
                   <div className="flex-1">
-                    <label className="block text-sm font-medium text-gray-700">Nombre del Tag</label>
+                    <label className="block text-sm font-medium text-gray-700">{t('settings.tags.tagName')}</label>
                     <input
                       type="text"
                       required
@@ -839,7 +843,7 @@ export default function Settings() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Color</label>
+                    <label className="block text-sm font-medium text-gray-700">{t('settings.tags.color')}</label>
                     <input
                       type="color"
                       className="mt-1 block w-16 h-9 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-1"
@@ -851,23 +855,23 @@ export default function Settings() {
                     type="submit"
                     className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                   >
-                    Crear Tag
+                    {t('settings.tags.createTag')}
                   </button>
                 </form>
 
                 {/* Tags List */}
                 {loadingTags ? (
-                  <div className="text-center py-4">Cargando tags...</div>
+                  <div className="text-center py-4">{t('settings.tags.loading')}</div>
                 ) : (
                   <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
                     <table className="min-w-full divide-y divide-gray-300">
                       <thead className="bg-gray-50">
                         <tr>
-                          <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">Nombre</th>
-                          <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Color</th>
-                          <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Uso</th>
+                          <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">{t('settings.tags.name')}</th>
+                          <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">{t('settings.tags.color')}</th>
+                          <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">{t('settings.tags.usage')}</th>
                           <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
-                            <span className="sr-only">Acciones</span>
+                            <span className="sr-only">{t('settings.tags.actions')}</span>
                           </th>
                         </tr>
                       </thead>
@@ -910,13 +914,13 @@ export default function Settings() {
           {activeTab === 'backups' && (
             <div className="bg-white shadow rounded-lg overflow-hidden">
               <div className="px-4 py-5 sm:px-6 border-b border-gray-200 flex justify-between items-center">
-                <h3 className="text-lg font-medium leading-6 text-gray-900">Copias de Seguridad</h3>
+                <h3 className="text-lg font-medium leading-6 text-gray-900">{t('settings.backups.title')}</h3>
                 <button
                   onClick={handleCreateBackup}
                   disabled={creatingBackup}
                   className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
                 >
-                  {creatingBackup ? 'Creando...' : 'Crear Backup Manual'}
+                  {creatingBackup ? t('settings.backups.creating') : t('settings.backups.createBackup')}
                 </button>
               </div>
               <div className="px-4 py-5 sm:p-6">
@@ -927,25 +931,24 @@ export default function Settings() {
                     </div>
                     <div className="ml-3">
                       <p className="text-sm text-yellow-700">
-                        Los backups incluyen toda la base de datos (usuarios, servidores, incidentes, etc.).
-                        Al restaurar, se reemplazarán todos los datos actuales.
+                        {t('settings.backups.warning')}
                       </p>
                     </div>
                   </div>
                 </div>
 
                 {loadingBackups ? (
-                  <div className="text-center py-4">Cargando backups...</div>
+                  <div className="text-center py-4">{t('settings.backups.loading')}</div>
                 ) : (
                   <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
                     <table className="min-w-full divide-y divide-gray-300">
                       <thead className="bg-gray-50">
                         <tr>
-                          <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">Archivo</th>
-                          <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Fecha</th>
-                          <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Tamaño</th>
+                          <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">{t('settings.backups.file')}</th>
+                          <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">{t('settings.backups.date')}</th>
+                          <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">{t('settings.backups.size')}</th>
                           <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
-                            <span className="sr-only">Acciones</span>
+                            <span className="sr-only">{t('settings.backups.actions')}</span>
                           </th>
                         </tr>
                       </thead>
@@ -983,7 +986,7 @@ export default function Settings() {
                         {backups.length === 0 && (
                           <tr>
                             <td colSpan={4} className="px-3 py-4 text-sm text-gray-500 text-center">
-                              No hay backups disponibles
+                              {t('settings.backups.noBackups')}
                             </td>
                           </tr>
                         )}
@@ -991,6 +994,18 @@ export default function Settings() {
                     </table>
                   </div>
                 )}
+              </div>
+            </div>
+          )}
+
+          {/* Language Tab */}
+          {activeTab === 'language' && (
+            <div className="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
+              <div className="px-4 py-5 sm:px-6 border-b border-gray-200 dark:border-gray-700">
+                <h3 className="text-lg font-medium leading-6 text-gray-900 dark:text-white">{t('settings.language.title')}</h3>
+              </div>
+              <div className="px-4 py-5 sm:p-6">
+                <LanguageSelector />
               </div>
             </div>
           )}
@@ -1005,8 +1020,8 @@ export default function Settings() {
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <span className="flex-grow flex flex-col">
-                      <span className="text-sm font-medium text-gray-900 dark:text-white">Tema Oscuro</span>
-                      <span className="text-sm text-gray-500 dark:text-gray-400">Habilitar modo oscuro para la interfaz</span>
+                      <span className="text-sm font-medium text-gray-900 dark:text-white">{t('settings.appearance.darkMode')}</span>
+                      <span className="text-sm text-gray-500 dark:text-gray-400">{t('settings.appearance.darkModeDesc')}</span>
                     </span>
                     <button
                       type="button"
@@ -1028,14 +1043,14 @@ export default function Settings() {
                   <div className="mt-8 border-t border-gray-200 dark:border-gray-700 pt-6">
                     <div className="flex items-center justify-between mb-4">
                       <div>
-                        <h4 className="text-base font-medium text-gray-900 dark:text-white">Personalización del Menú</h4>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">Organiza y oculta elementos del menú lateral</p>
+                        <h4 className="text-base font-medium text-gray-900 dark:text-white">{t('settings.menu.title')}</h4>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">{t('settings.menu.description')}</p>
                       </div>
                       <button
                         onClick={resetMenu}
                         className="text-sm text-indigo-600 hover:text-indigo-500 dark:text-indigo-400"
                       >
-                        Restaurar valores por defecto
+                        {t('settings.menu.resetToDefault')}
                       </button>
                     </div>
 
@@ -1054,6 +1069,7 @@ export default function Settings() {
                               key={item.id}
                               item={item}
                               toggleVisibility={toggleVisibility}
+                              t={t}
                             />
                           ))}
                         </SortableContext>
@@ -1073,12 +1089,12 @@ export default function Settings() {
         <div className="fixed inset-0 flex items-center justify-center p-4">
           <Dialog.Panel className="mx-auto max-w-sm rounded bg-white p-6 w-full">
             <Dialog.Title className="text-lg font-medium leading-6 text-gray-900 mb-4">
-              {editingUser ? 'Editar Usuario' : 'Crear Nuevo Usuario'}
+              {editingUser ? t('settings.users.editUser') : t('settings.users.createUser')}
             </Dialog.Title>
             <form onSubmit={handleSaveUser}>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Nombre Completo</label>
+                  <label className="block text-sm font-medium text-gray-700">{t('settings.users.fullName')}</label>
                   <input
                     type="text"
                     required
@@ -1088,7 +1104,7 @@ export default function Settings() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Email</label>
+                  <label className="block text-sm font-medium text-gray-700">{t('settings.users.email')}</label>
                   <input
                     type="email"
                     required
@@ -1115,7 +1131,7 @@ export default function Settings() {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Rol</label>
+                  <label className="block text-sm font-medium text-gray-700">{t('settings.users.role')}</label>
                   <select
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
                     value={userFormData.role}
@@ -1133,7 +1149,7 @@ export default function Settings() {
                   onClick={() => setIsUserModalOpen(false)}
                   className="inline-flex justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                 >
-                  Cancelar
+                  {t('settings.profile.cancel')}
                 </button>
                 <button
                   type="submit"

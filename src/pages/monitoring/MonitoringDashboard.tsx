@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { 
   ServerIcon, 
   ArrowPathIcon 
@@ -31,6 +32,7 @@ interface DashboardStats {
 }
 
 export default function MonitoringDashboard() {
+  const { t } = useTranslation();
   const [servers, setServers] = useState<ServerWithHealth[]>([]);
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
@@ -88,25 +90,25 @@ export default function MonitoringDashboard() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold text-gray-900">Monitoreo de Servidores</h1>
+        <h1 className="text-2xl font-semibold text-gray-900">{t('monitoring.title')}</h1>
       </div>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
         <div className="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6">
-          <dt className="truncate text-sm font-medium text-gray-500">Total Servidores</dt>
+          <dt className="truncate text-sm font-medium text-gray-500">{t('monitoring.totalServers')}</dt>
           <dd className="mt-1 text-3xl font-semibold tracking-tight text-gray-900">{stats?.total || 0}</dd>
         </div>
         <div className="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6">
-          <dt className="truncate text-sm font-medium text-gray-500">Online</dt>
+          <dt className="truncate text-sm font-medium text-gray-500">{t('monitoring.online')}</dt>
           <dd className="mt-1 text-3xl font-semibold tracking-tight text-green-600">{stats?.online || 0}</dd>
         </div>
         <div className="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6">
-          <dt className="truncate text-sm font-medium text-gray-500">Offline</dt>
+          <dt className="truncate text-sm font-medium text-gray-500">{t('monitoring.offline')}</dt>
           <dd className="mt-1 text-3xl font-semibold tracking-tight text-red-600">{stats?.offline || 0}</dd>
         </div>
         <div className="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6">
-          <dt className="truncate text-sm font-medium text-gray-500">Tiempo Promedio</dt>
+          <dt className="truncate text-sm font-medium text-gray-500">{t('monitoring.avgResponseTime')}</dt>
           <dd className="mt-1 text-3xl font-semibold tracking-tight text-gray-900">{stats?.avgResponseTime || 0} ms</dd>
         </div>
       </div>
@@ -155,7 +157,7 @@ export default function MonitoringDashboard() {
                       "font-medium",
                       isOnline ? "text-green-600" : "text-red-600"
                     )}>
-                      {isOnline ? 'Online' : 'Offline'}
+                      {isOnline ? t('monitoring.online') : t('monitoring.offline')}
                     </span>
                   </div>
                   <div className="mt-2 flex items-center justify-between text-sm">
